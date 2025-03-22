@@ -20,7 +20,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: python manage.py runserver
+    command: python manage.py runserver 0.0.0.0:8000
     hostname: backend
     ports:
       - "$BE_PORT:8000"
@@ -53,7 +53,25 @@ services:
       - .env
     depends_on:
       - redis
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    hostname: frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    ports:
+      - "$FE_PORT:8080"
+    stdin_open: true
+    tty: true
+    command: npm run dev
+    depends_on:
+      - backend
 
 volumes:
   db-data:
   backend:
+  frontend:

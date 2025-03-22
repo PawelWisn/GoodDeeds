@@ -42,6 +42,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "django_celery_beat",
+    "channels",
     "chat",
 ]
 
@@ -85,8 +87,32 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "GoodDeeds.wsgi.application"
 
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE = {
+    # "sample_task": {
+    #     "task": "tasks.sample_task",
+    #     "schedule": crontab(minute="*/1"),
+    # },
+}
+
+
+WSGI_APPLICATION = "GoodDeeds.wsgi.application"
+ASGI_APPLICATION = "GoodDeeds.asgi.application"
+
+
+CHANNELS_HOST = os.getenv("CHANNELS_HOST")
+CHANNELS_PORT = os.getenv("CHANNELS_PORT")
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(CHANNELS_HOST, CHANNELS_PORT)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -144,12 +170,17 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_BEAT_SCHEDULE = {
-    "sample_task": {
-        "task": "tasks.sample_task",
-        "schedule": crontab(minute="*/1"),
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
 }
