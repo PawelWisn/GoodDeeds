@@ -1,0 +1,33 @@
+@use "../variables" as v;
+
+.login-card {
+  background-color: v.$card-bg;
+  margin-top: 10%;
+  width: 30rem;
+  padding: 2rem;
+  border: 1px solid #fff;
+  color: #fff;
+
+  .login-input {
+    margin: 1.2rem 0;
+
+    input {
+      padding: 1rem;
+      font-size: 1rem;
+      background-color: v.$bg;
+      color: #fff;
+
+      &::placeholder {
+        color: #fff;
+      }
+    }
+    label {
+      text-align: left;
+      color: #fff;
+    }
+  }
+
+  button {
+    font-size: 1.3rem;
+  }
+}
