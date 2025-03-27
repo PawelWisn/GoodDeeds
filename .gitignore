@@ -132,3 +132,5 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+client_secret.json

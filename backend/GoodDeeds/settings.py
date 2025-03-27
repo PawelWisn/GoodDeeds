@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "channels",
     "chat",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,8 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
@@ -128,6 +131,28 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "drf_social_oauth2.authentication.SocialAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.google.GoogleOAuth2",
+    "drf_social_oauth2.backends.DjangoOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_URL = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_URL")
+SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL")
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -184,3 +209,6 @@ LOGGING = {
         "level": "DEBUG",
     },
 }
+
+
+AUTH_USER_MODEL = "users.User"

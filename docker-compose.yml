@@ -16,7 +16,6 @@ services:
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
   backend:
-    restart: on-failure
     build:
       context: ./backend
       dockerfile: Dockerfile
