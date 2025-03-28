@@ -53,3 +53,9 @@ def verify_auth(request):
         else:
             status = 204
     return JsonResponse({}, status=status)
+
+
+def logout_view(request):
+    response = JsonResponse({}, status=204)
+    response.delete_cookie("id_token")
+    return response

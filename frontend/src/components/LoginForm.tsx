@@ -1,41 +1,32 @@
 import "./LoginForm.scss";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";
-import Cookies from "js-cookie";
+
+const login_failed_msg = "Login failed. Please try again";
 
 function LoginForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   let navigate = useNavigate();
 
-  useEffect(() => {
-    axiosClient.get("/users/set_csrf_token/");
-    axiosClient.defaults.headers.common["X-CSRFToken"] =
-      Cookies.get("csrftoken");
-  }, []);
-
   const responseMessage = (response: { credential?: string }) => {
     if (response.credential) {
       axiosClient
-        .post(
-          "/users/google_login_react/",
-          { id_token: response.credential },
-          { headers: { "X-CSRFToken": Cookies.get("csrftoken") } },
-        )
+        .post("/users/google_login_react/", { id_token: response.credential })
         .then(() => {
           navigate("/dashboard");
         })
         .catch(() => {
-          setErrorMsg("Login failed. Please try again");
+          setErrorMsg(login_failed_msg);
         });
     } else {
-      setErrorMsg("Login failed. Please try again");
+      setErrorMsg(login_failed_msg);
     }
   };
 
   const errorMessage = () => {
-    setErrorMsg("Login failed. Please try again");
+    setErrorMsg(login_failed_msg);
   };
 
   return (
@@ -44,7 +35,7 @@ function LoginForm() {
       <div id={"google-login-button"}>
         <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
       </div>
-      {errorMsg && <div className="error-message">{errorMsg}</div>}
+      {errorMsg && <div className={"error-message"}>{errorMsg}</div>}
     </div>
   );
 }
