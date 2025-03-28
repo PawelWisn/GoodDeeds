@@ -1,58 +1,50 @@
 import "./LoginForm.scss";
-import axiosClient from "../utils/axiosInstance";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
+import axiosClient from "../utils/axiosInstance";
+import Cookies from "js-cookie";
 
 function LoginForm() {
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   let navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const response = await axiosClient.post(
-        `${import.meta.env.VITE_API_URL}/users/login/`,
-        {
-          email: email,
-          password: password,
-        },
-      );
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+  useEffect(() => {
+    axiosClient.get("/users/set_csrf_token/");
+    axiosClient.defaults.headers.common["X-CSRFToken"] =
+      Cookies.get("csrftoken");
+  }, []);
+
+  const responseMessage = (response: { credential?: string }) => {
+    if (response.credential) {
+      axiosClient
+        .post(
+          "/users/google_login_react/",
+          { id_token: response.credential },
+          { headers: { "X-CSRFToken": Cookies.get("csrftoken") } },
+        )
+        .then(() => {
+          navigate("/dashboard");
+        })
+        .catch(() => {
+          setErrorMsg("Login failed. Please try again");
+        });
+    } else {
+      setErrorMsg("Login failed. Please try again");
     }
   };
 
+  const errorMessage = () => {
+    setErrorMsg("Login failed. Please try again");
+  };
+
   return (
-    <div className={"card login-card"}>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group login-input">
-          <label htmlFor="inputEmail">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            id="inputEmail"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="form-group login-input">
-          <label htmlFor="inputPassword">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="inputPassword"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Login
-        </button>
-      </form>
+    <div id={"login-form"} className={"card"}>
+      <h2>Login by Google</h2>
+      <div id={"google-login-button"}>
+        <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
+      </div>
+      {errorMsg && <div className="error-message">{errorMsg}</div>}
     </div>
   );
 }

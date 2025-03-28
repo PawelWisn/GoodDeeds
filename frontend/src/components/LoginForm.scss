@@ -1,33 +1,20 @@
 @use "../variables" as v;
 
-.login-card {
+#login-form {
   background-color: v.$card-bg;
-  margin-top: 10%;
-  width: 30rem;
-  padding: 2rem;
-  border: 1px solid #fff;
+  margin: 20% auto;
+  max-width: 60%;
+  padding: 5rem;
+  border: 3px solid #fff;
+  border-radius: 3rem;
   color: #fff;
 
-  .login-input {
-    margin: 1.2rem 0;
-
-    input {
-      padding: 1rem;
-      font-size: 1rem;
-      background-color: v.$bg;
-      color: #fff;
-
-      &::placeholder {
-        color: #fff;
-      }
-    }
-    label {
-      text-align: left;
-      color: #fff;
-    }
+  h2 {
+    margin-bottom: 2rem;
   }
+}
 
-  button {
-    font-size: 1.3rem;
-  }
+#google-login-button {
+  width: 60%;
+  margin: auto;
 }

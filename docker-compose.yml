@@ -62,6 +62,10 @@ services:
       - /app/node_modules
     env_file:
       - .env
+    environment:
+      - VITE_API_URL=$API_URL
+      - VITE_GOOGLE_AUTH_KEY=$GOOGLE_OAUTH2_KEY
+      - VITE_GOOGLE_TOKEN_URL=$GOOGLE_OAUTH2_TOKEN_URL
     ports:
       - "$FE_PORT:8080"
     stdin_open: true
