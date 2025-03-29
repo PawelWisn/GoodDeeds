@@ -27,10 +27,9 @@ def google_login_react(request):
         data = response.json()
 
         user, _ = get_user_model().objects.get_or_create(sub=data["sub"])
-        data["user_id"] = user.id
 
         max_age = int(data["exp"]) - int(datetime.now(timezone.utc).timestamp())
-        response = JsonResponse(data)
+        response = JsonResponse({"user_id": user.id, "name": data["name"]})
         response.set_cookie(
             key="id_token",
             value=id_token,
@@ -71,7 +70,6 @@ def about_me(request):
             return response
 
         user = get_user_model().objects.get(sub=data["sub"])
-        data["user_id"] = user.id
-        return JsonResponse(data)
+        return JsonResponse({"user_id": user.id, "name": data["name"]})
 
     return JsonResponse({}, status=401)
