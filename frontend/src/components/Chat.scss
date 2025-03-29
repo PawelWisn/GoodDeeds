@@ -1,4 +1,5 @@
 @use "../variables" as v;
+@use "sass:color";
 
 .chat-container {
   display: flex;
@@ -52,7 +53,7 @@
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: lighten(v.$submit-button-bg, 10%);
+      background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
     }
   }
 }
