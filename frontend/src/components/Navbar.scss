@@ -21,11 +21,14 @@ nav {
   button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
-    background-color: #ff4d4d;
+    background-color: #f02929;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    &:hover {
+      background-color: #ff4d4d;
+    }
   }
 
   #nav-user-name {

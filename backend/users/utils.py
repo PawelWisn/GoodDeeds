@@ -9,7 +9,8 @@ def decode_id_token(id_token: str) -> dict | None:
         return None
 
 
-def get_logout_response(status=204):
-    response = JsonResponse({}, status=status)
+def get_logout_response(data=None, status=204):
+    data = data or {}
+    response = JsonResponse(data, status=status)
     response.delete_cookie("id_token")
     return response

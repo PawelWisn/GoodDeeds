@@ -46,7 +46,7 @@ def verify_auth(request):
     if id_token := request.COOKIES.get("id_token"):
         if data := decode_id_token(id_token):
             return JsonResponse({}, status=204)
-    return get_logout_response(401)
+    return get_logout_response(status=401)
 
 
 def logout_view(request):
@@ -58,4 +58,4 @@ def about_me(request):
         if data := decode_id_token(id_token):
             user = get_user_model().objects.get(sub=data["sub"])
             return JsonResponse({"user_id": user.id, "user_name": data["name"]})
-    return get_logout_response(401)
+    return get_logout_response(status=401)

@@ -1,6 +1,5 @@
 import json
 
-import jwt
 from chat.models import ChatRoom
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
@@ -12,26 +11,25 @@ User = get_user_model()
 def chats_view(request):
     id_token = request.COOKIES.get("id_token")
     if not id_token:
-        return get_logout_response(401)
+        return get_logout_response({"error": "No id token"}, 401)
 
     data = decode_id_token(id_token)
     if not data:
-        return get_logout_response(401)
+        return get_logout_response({"error": "No id token"}, 401)
 
-    user = User.objects.filter(id=request.user.id).first()
+    user = User.objects.filter(sub=data["sub"]).first()
     if not user:
-        return JsonResponse({}, status=401)
+        return JsonResponse({{"error": "User not found"}}, status=404)
 
     if request.method == "POST":
         data = json.loads(request.body)
-        room_name = data.get("room_name")
-        user_id = data.get("user_id")
+        room_name = data.get("name")
 
-        if not room_name or not user_id:
-            return JsonResponse({"error": "Missing room_name or user_id"}, status=400)
+        if not room_name:
+            return JsonResponse({"error": "Missing room name"}, status=400)
 
-        chat = ChatRoom.objects.create(name=room_name, created_by_id=user_id)
-        chat.members.add(user_id)
+        chat = ChatRoom.objects.create(name=room_name, created_by=user)
+        chat.members.add(user)
 
         return JsonResponse({"id": chat.id, "name": room_name}, status=201)
 
@@ -46,6 +44,6 @@ def chats_view(request):
             }
             for room in available_rooms
         ]
-        return JsonResponse(response_data, status=200)
+        return JsonResponse(response_data, status=200, safe=False)
 
     return JsonResponse({}, status=405)
