@@ -1,17 +1,17 @@
 import json
 from datetime import datetime, timezone
 
-import jwt
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
+from users.utils import decode_id_token, get_logout_response
 
 
 def set_csrf_token(request):
     csrf_token = get_token(request)
-    return JsonResponse({"csrfToken": csrf_token})
+    return JsonResponse({"csrftoken": csrf_token})
 
 
 def google_login_react(request):
@@ -29,7 +29,7 @@ def google_login_react(request):
         user, _ = get_user_model().objects.get_or_create(sub=data["sub"])
 
         max_age = int(data["exp"]) - int(datetime.now(timezone.utc).timestamp())
-        response = JsonResponse({"user_id": user.id, "name": data["name"]})
+        response = JsonResponse({"user_id": user.id, "user_name": data["name"]})
         response.set_cookie(
             key="id_token",
             value=id_token,
@@ -44,32 +44,18 @@ def google_login_react(request):
 
 def verify_auth(request):
     if id_token := request.COOKIES.get("id_token"):
-        try:
-            jwt.decode(id_token, options={"verify_signature": False})
-        except:
-            response = JsonResponse({}, status=401)
-            response.delete_cookie("id_token")
-            return response
-        return JsonResponse({}, status=204)
-    return JsonResponse({}, status=401)
+        if data := decode_id_token(id_token):
+            return JsonResponse({}, status=204)
+    return get_logout_response(401)
 
 
 def logout_view(request):
-    response = JsonResponse({}, status=204)
-    response.delete_cookie("id_token")
-    return response
+    return get_logout_response()
 
 
 def about_me(request):
     if id_token := request.COOKIES.get("id_token"):
-        try:
-            data = jwt.decode(id_token, options={"verify_signature": False})
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-            response = JsonResponse({}, status=401)
-            response.delete_cookie("id_token")
-            return response
-
-        user = get_user_model().objects.get(sub=data["sub"])
-        return JsonResponse({"user_id": user.id, "name": data["name"]})
-
-    return JsonResponse({}, status=401)
+        if data := decode_id_token(id_token):
+            user = get_user_model().objects.get(sub=data["sub"])
+            return JsonResponse({"user_id": user.id, "user_name": data["name"]})
+    return get_logout_response(401)

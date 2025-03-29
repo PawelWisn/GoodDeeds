@@ -4,11 +4,12 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   padding: 1rem 2rem;
   background-color: v.$navbar-bg;
   color: #fff;
 
-  div {
+  #nav-app-name {
     font-size: 1.5rem;
     font-weight: bold;
 
@@ -25,5 +26,14 @@ nav {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+  }
+
+  #nav-user-name {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    font-style: italic;
+    text-align: center;
   }
 }

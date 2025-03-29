@@ -14,7 +14,9 @@ function LoginForm() {
     if (response.credential) {
       axiosClient
         .post("/users/google_login_react/", { id_token: response.credential })
-        .then(() => {
+        .then((response) => {
+          sessionStorage.setItem("user_id", response.data.user_id);
+          sessionStorage.setItem("user_name", response.data.user_name);
           navigate("/dashboard");
         })
         .catch(() => {

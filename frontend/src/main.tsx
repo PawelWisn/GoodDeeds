@@ -26,6 +26,7 @@ const initializeCSRFToken = async () => {
 };
 
 initializeCSRFToken();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={VITE_GOOGLE_AUTH_KEY}>
