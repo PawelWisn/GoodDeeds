@@ -28,15 +28,16 @@ const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
         onChatRoomCreated();
       })
       .catch((error) => {
-        console.error("Failed to create chat room:", error);
-        setErrorMessage("Failed to create chat room. Please try again.");
+        setErrorMessage(
+          error.response?.data?.error || "Failed to create chat room.",
+        );
         setSuccessMessage(null);
       });
   };
 
   return (
     <div className="new-chat-room-container">
-      <h2>Create a new chat room</h2>
+      <h2>Create new chat room</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"

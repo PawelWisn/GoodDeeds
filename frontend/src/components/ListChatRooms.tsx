@@ -1,10 +1,10 @@
 import React from "react";
 import "./ListChatRooms.scss";
+import ChatRoomCard from "./ChatRoomCard";
 
 interface ChatRoom {
   id: number;
   name: string;
-  description: string;
 }
 
 interface ListChatRoomsProps {
@@ -17,10 +17,7 @@ const ListChatRooms: React.FC<ListChatRoomsProps> = ({ chatRooms }) => {
       <h2>Chat Rooms</h2>
       <div className="chat-rooms-grid">
         {chatRooms.map((room) => (
-          <div key={room.id} className="chat-room-card">
-            <h3>{room.name}</h3>
-            <p>{room.description}</p>
-          </div>
+          <ChatRoomCard key={room.id} id={room.id} name={room.name} />
         ))}
       </div>
     </div>

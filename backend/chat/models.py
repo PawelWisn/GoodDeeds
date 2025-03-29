@@ -7,7 +7,7 @@ from django.db import models
 
 class ChatRoom(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=datetime.now)
     created_by = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="created_chat_rooms")
     members = models.ManyToManyField("users.User", related_name="chat_rooms", blank=True)

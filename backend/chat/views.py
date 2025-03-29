@@ -27,6 +27,9 @@ def chats_view(request):
 
         if not room_name:
             return JsonResponse({"error": "Missing room name"}, status=400)
+        name_max_length = ChatRoom._meta.get_field("name").max_length
+        if len(room_name) > name_max_length:
+            return JsonResponse({"error": f"Room name too long, Only {name_max_length} characters are allowed"}, status=400)
 
         chat = ChatRoom.objects.create(name=room_name, created_by=user)
         chat.members.add(user)
