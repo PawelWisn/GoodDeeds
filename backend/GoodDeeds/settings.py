@@ -142,6 +142,7 @@ AUTHENTICATION_BACKENDS = (
 
 GOOGLE_OAUTH2_TOKEN_INFO_URI = os.getenv("GOOGLE_OAUTH2_TOKEN_INFO_URI")
 
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",

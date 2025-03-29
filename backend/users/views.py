@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 
 import jwt
 import requests
@@ -20,42 +21,57 @@ def google_login_react(request):
         if not id_token:
             return JsonResponse({"error": "Missing id_token"}, status=400)
 
-        try:
-            response = requests.get(f"{settings.GOOGLE_OAUTH2_TOKEN_INFO_URI}?id_token={id_token}")
-            if response.status_code != 200:
-                return JsonResponse({"error": "Invalid token"}, status=401)
-
-            sub = response.json()["sub"]
-
-            user, _ = get_user_model().objects.get_or_create(sub=sub)
-
-            response = JsonResponse({"user_id": user.id})
-            response.set_cookie(key="id_token", value=id_token, httponly=True, samesite="Strict")
-            return response
-
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({"error": "Token expired"}, status=401)
-        except jwt.InvalidTokenError:
+        response = requests.get(f"{settings.GOOGLE_OAUTH2_TOKEN_INFO_URI}?id_token={id_token}")
+        if response.status_code != 200:
             return JsonResponse({"error": "Invalid token"}, status=401)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+        data = response.json()
 
-    return JsonResponse({})
+        user, _ = get_user_model().objects.get_or_create(sub=data["sub"])
+        data["user_id"] = user.id
+
+        max_age = int(data["exp"]) - int(datetime.now(timezone.utc).timestamp())
+        response = JsonResponse(data)
+        response.set_cookie(
+            key="id_token",
+            value=id_token,
+            httponly=True,
+            samesite="Strict",
+            max_age=max_age,
+        )
+        return response
+
+    return JsonResponse({}, status=204)
 
 
 def verify_auth(request):
-    status = 401
     if id_token := request.COOKIES.get("id_token"):
         try:
             jwt.decode(id_token, options={"verify_signature": False})
         except:
-            status = 401
-        else:
-            status = 204
-    return JsonResponse({}, status=status)
+            response = JsonResponse({}, status=401)
+            response.delete_cookie("id_token")
+            return response
+        return JsonResponse({}, status=204)
+    return JsonResponse({}, status=401)
 
 
 def logout_view(request):
     response = JsonResponse({}, status=204)
     response.delete_cookie("id_token")
     return response
+
+
+def about_me(request):
+    if id_token := request.COOKIES.get("id_token"):
+        try:
+            data = jwt.decode(id_token, options={"verify_signature": False})
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            response = JsonResponse({}, status=401)
+            response.delete_cookie("id_token")
+            return response
+
+        user = get_user_model().objects.get(sub=data["sub"])
+        data["user_id"] = user.id
+        return JsonResponse(data)
+
+    return JsonResponse({}, status=401)
