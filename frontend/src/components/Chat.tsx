@@ -8,6 +8,8 @@ import {
   decryptMessage,
 } from "../utils/crypto";
 
+import "./Chat.scss";
+
 function Chat() {
   const [message, setMessage] = useState("");
   const [chatLog, setChatLog] = useState<string>("");
@@ -129,7 +131,7 @@ function Chat() {
   }, []);
 
   return (
-    <div>
+    <div className="chat-container">
       <textarea
         id="chat-log"
         cols={100}

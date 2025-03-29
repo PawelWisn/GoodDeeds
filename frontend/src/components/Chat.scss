@@ -1,0 +1,58 @@
+@use "../variables" as v;
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 85vh;
+  background-color: v.$bg;
+  color: #fff;
+  border-radius: 8px;
+  width: clamp(50%, 60rem, 90%);
+  margin: 2rem auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  #chat-log {
+    flex-grow: 1;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: v.$card-bg;
+    color: v.$card-color;
+    resize: none;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    color: v.$card-color;
+
+    &:focus {
+      outline: none;
+      border-color: #fff;
+    }
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: v.$submit-button-bg;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: lighten(v.$submit-button-bg, 10%);
+    }
+  }
+}

@@ -36,7 +36,7 @@ createRoot(document.getElementById("root")!).render(
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route path="/chats/:id" element={<Chat />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/dashboard" />} />
