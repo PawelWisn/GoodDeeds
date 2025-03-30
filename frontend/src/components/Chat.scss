@@ -5,13 +5,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   height: 85vh;
+  padding: 1rem;
   background-color: v.$bg;
-  color: #fff;
-  border-radius: 8px;
-  width: clamp(50%, 60rem, 90%);
-  margin: 2rem auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: v.$card-bg;
+  width: 80%;
+  margin: auto;
 
   #chat-log {
     flex-grow: 1;
@@ -20,11 +20,33 @@
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: v.$card-bg;
-    color: v.$card-color;
-    resize: none;
+    background-color: v.$chat-card-bg;
+    color: #333;
     overflow-y: auto;
     margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chat-message {
+    max-width: 60%;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    word-wrap: break-word;
+
+    &.own-message {
+      align-self: flex-end;
+      background-color: v.$primary-color;
+      color: #fff;
+    }
+
+    &.incoming-message {
+      align-self: flex-start;
+      background-color: #e0e0e0;
+      color: #333;
+    }
   }
 
   input[type="text"] {
@@ -34,7 +56,6 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 1rem;
-    color: v.$card-color;
 
     &:focus {
       outline: none;

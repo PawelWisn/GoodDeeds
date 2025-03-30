@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-
+import "./Chat.scss";
 import {
   generateKeys,
   importPublicKey,
@@ -8,12 +7,15 @@ import {
   decryptMessage,
 } from "../utils/crypto";
 
-import "./Chat.scss";
+interface ChatMessage {
+  text: string;
+  isOwnMessage: boolean;
+}
 
 function Chat() {
   const [message, setMessage] = useState("");
-  const [chatLog, setChatLog] = useState<string>("");
-  const [myUUID, setMyUUID] = useState<string>(uuidv4());
+  const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
+  const [myUUID, setMyUUID] = useState(sessionStorage.getItem("user_id")!);
 
   const socketRef = useRef<WebSocket | null>(null);
   const myPublicKeyRef = useRef<CryptoKey | null>(null);
@@ -39,11 +41,7 @@ function Chat() {
   }
 
   async function handleSendMessage() {
-    console.log(
-      "handleSendMessage - recipientPublicKeyRef.current:",
-      recipientPublicKeyRef.current,
-    );
-    if (!socketRef.current) return;
+    if (!message || !socketRef.current) return;
     if (!recipientPublicKeyRef.current) {
       console.log(
         "handleSendMessage - no recipient public key, demand public key",
@@ -51,11 +49,19 @@ function Chat() {
       socketRef.current.send(
         JSON.stringify({ type: "public_key_demand", ownerUUID: myUUID }),
       );
-      return;
+      await new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          if (recipientPublicKeyRef.current) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 50);
+      });
     }
+
     const encryptedBase64 = await encryptMessage(
       message,
-      recipientPublicKeyRef.current,
+      recipientPublicKeyRef.current!,
     );
     socketRef.current.send(
       JSON.stringify({
@@ -65,7 +71,11 @@ function Chat() {
       }),
     );
     console.log("handleSendMessage - send:", message);
-    setChatLog((prevLog) => prevLog + myUUID + ": " + message + "\n");
+
+    setChatLog((prevLog) => [
+      ...prevLog,
+      { text: message, isOwnMessage: true },
+    ]);
     setMessage("");
   }
 
@@ -104,12 +114,15 @@ function Chat() {
       myPrivateKeyRef.current,
     );
     console.log("handleReceiveMessage - Decrypted Message:", decrypted);
-    setChatLog((prevLog) => prevLog + data.ownerUUID + ": " + decrypted + "\n");
+    setChatLog((prevLog) => [
+      ...prevLog,
+      { text: decrypted, isOwnMessage: false },
+    ]);
   }
 
   async function handleReceiveMessage(event: MessageEvent) {
     const data = JSON.parse(event.data);
-    if (data.ownerUUID == myUUID) return;
+    if (data.ownerUUID === myUUID) return;
     console.log("handleReceiveMessage - data:", data);
     if (data.type === "message") await handleMessage(data);
     if (data.type === "public_key") await handlePublicKey(data);
@@ -132,16 +145,17 @@ function Chat() {
 
   return (
     <div className="chat-container">
-      <textarea
-        id="chat-log"
-        cols={100}
-        rows={20}
-        value={chatLog}
-        readOnly
-      ></textarea>
-      <br />
+      <div id="chat-log">
+        {chatLog.map((msg, index) => (
+          <div
+            key={index}
+            className={`chat-message ${msg.isOwnMessage ? "own-message" : "incoming-message"}`}
+          >
+            {msg.text}
+          </div>
+        ))}
+      </div>
       <input
-        size={100}
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
