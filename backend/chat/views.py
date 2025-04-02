@@ -8,7 +8,7 @@ from users.utils import decode_id_token, get_logout_response
 User = get_user_model()
 
 
-def chats_view(request):
+def chat_rooms_list(request):
     id_token = request.COOKIES.get("id_token")
     if not id_token:
         return get_logout_response({"error": "No id token"}, 401)
@@ -42,11 +42,38 @@ def chats_view(request):
             {
                 "id": room.id,
                 "name": room.name,
-                "created_by": room.created_by.id,
                 "own_room": room.created_by == user,
             }
             for room in available_rooms
         ]
         return JsonResponse(response_data, status=200, safe=False)
+
+    return JsonResponse({}, status=405)
+
+
+def chat_room_detail(request, room_id):
+    id_token = request.COOKIES.get("id_token")
+    if not id_token:
+        return get_logout_response({"error": "No id token"}, 401)
+
+    data = decode_id_token(id_token)
+    if not data:
+        return get_logout_response({"error": "No id token"}, 401)
+
+    user = User.objects.filter(sub=data["sub"]).first()
+    if not user:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+    chat = ChatRoom.objects.filter(id=room_id).first()
+    if not chat:
+        return JsonResponse({"error": "Chat room not found"}, status=404)
+
+    if request.method == "GET":
+        response_data = {
+            "id": chat.id,
+            "name": chat.name,
+            "own_room": chat.created_by == user,
+        }
+        return JsonResponse(response_data, status=200)
 
     return JsonResponse({}, status=405)

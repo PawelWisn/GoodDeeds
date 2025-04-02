@@ -1,5 +1,5 @@
-from chat.views import chats_view
-from django.urls import path, re_path
+from chat.views import chat_room_detail, chat_rooms_list
+from django.urls import re_path
 
 from .consumers import ChatConsumer
 
@@ -9,5 +9,6 @@ websocket_urlpatterns = [
 ]
 
 urlpatterns = [
-    path("", chats_view, name="chats"),
+    re_path(r"^$", chat_rooms_list, name="chat_rooms_list"),
+    re_path(r"^(?P<room_id>[0-9a-fA-F-]{36})/$", chat_room_detail, name="chat_room_detail"),
 ]
