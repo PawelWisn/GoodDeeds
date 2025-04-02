@@ -2,7 +2,10 @@ import uuid
 from datetime import datetime
 
 from chat.managers import ChatRoomManager
+from django.contrib.auth import get_user_model
 from django.db import models
+
+User = get_user_model()
 
 
 class ChatRoom(models.Model):
@@ -16,3 +19,6 @@ class ChatRoom(models.Model):
 
     def __str__(self):
         return self.name
+
+    def can_delete(self, user: User) -> bool:
+        return self.created_by == user

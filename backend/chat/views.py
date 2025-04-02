@@ -15,7 +15,7 @@ def chat_rooms_list(request):
 
     data = decode_id_token(id_token)
     if not data:
-        return get_logout_response({"error": "No id token"}, 401)
+        return get_logout_response({"error": "Token invalid"}, 401)
 
     user = User.objects.filter(sub=data["sub"]).first()
     if not user:
@@ -43,6 +43,7 @@ def chat_rooms_list(request):
                 "id": room.id,
                 "name": room.name,
                 "own_room": room.created_by == user,
+                "can_delete": room.can_delete(user),
             }
             for room in available_rooms
         ]
@@ -58,7 +59,7 @@ def chat_room_detail(request, room_id):
 
     data = decode_id_token(id_token)
     if not data:
-        return get_logout_response({"error": "No id token"}, 401)
+        return get_logout_response({"error": "Token invalid"}, 401)
 
     user = User.objects.filter(sub=data["sub"]).first()
     if not user:
@@ -68,12 +69,10 @@ def chat_room_detail(request, room_id):
     if not chat:
         return JsonResponse({"error": "Chat room not found"}, status=404)
 
-    if request.method == "GET":
-        response_data = {
-            "id": chat.id,
-            "name": chat.name,
-            "own_room": chat.created_by == user,
-        }
-        return JsonResponse(response_data, status=200)
+    if request.method == "DELETE":
+        if not chat.can_delete(user):
+            return JsonResponse({"error": "You are not allowed to delete this chat room"}, status=403)
+        chat.delete()
+        return JsonResponse({}, status=204)
 
     return JsonResponse({}, status=405)

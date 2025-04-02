@@ -1,6 +1,7 @@
 @use "../variables" as v;
 
 .chat-room-card {
+  position: relative;
   background-color: v.$card-bg;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -22,6 +23,27 @@
     overflow-wrap: break-word;
     word-break: break-word;
     text-align: center;
+  }
+
+  .delete-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: darkred;
+    }
   }
 
   &:hover {
