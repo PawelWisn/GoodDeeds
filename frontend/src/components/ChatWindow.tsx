@@ -143,6 +143,12 @@ function Chat() {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Enter message"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSendMessage();
+          }
+        }}
+        autoFocus
       />
       <button onClick={handleSendMessage}>Encrypt & Send</button>
     </div>
