@@ -119,6 +119,9 @@ function Chat() {
     };
     ws.onmessage = handleReceiveMessage;
     ws.onerror = (error) => console.error("WebSocket error:", error);
+    ws.onclose = () => {
+      socketRef.current = null;
+    };
 
     return () => ws.close();
   }, []);
