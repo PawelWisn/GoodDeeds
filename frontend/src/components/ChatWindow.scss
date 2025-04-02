@@ -38,14 +38,14 @@
 
     &.own-message {
       align-self: flex-end;
-      background-color: v.$primary-color;
+      background-color: #006600;
       color: #fff;
     }
 
     &.incoming-message {
       align-self: flex-start;
-      background-color: #e0e0e0;
-      color: #333;
+      background-color: #efff12;
+      color: #000;
     }
   }
 
