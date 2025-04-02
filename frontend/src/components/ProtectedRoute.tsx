@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import Navbar from "./Navbar";
 
 const ProtectedRoute: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     axiosClient
@@ -15,7 +16,7 @@ const ProtectedRoute: React.FC = () => {
       .catch(() => {
         setIsAuthenticated(false);
       });
-  }, []);
+  }, [location.pathname]);
 
   if (isAuthenticated === null) {
     return <div>Loading...</div>;

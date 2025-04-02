@@ -116,6 +116,7 @@ function Chat() {
     ws.onopen = () => {
       socketRef.current = ws;
       setupKeys();
+      console.log("WebSocket connection established");
     };
     ws.onmessage = handleReceiveMessage;
     ws.onerror = (error) => console.error("WebSocket error:", error);
