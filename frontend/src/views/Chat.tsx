@@ -1,11 +1,7 @@
-import Chat from "../components/Chat";
+import ChatWindow from "../components/ChatWindow";
 
-function App() {
-  return (
-    <div>
-      <Chat />
-    </div>
-  );
+function Chat() {
+  return <ChatWindow />;
 }
 
-export default App;
+export default Chat;

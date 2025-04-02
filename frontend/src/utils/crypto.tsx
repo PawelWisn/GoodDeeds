@@ -67,7 +67,6 @@ export async function decryptMessage(
     );
     return new TextDecoder().decode(decryptedBuffer);
   } catch (error) {
-    console.log("Failed to decrypt message:", error);
     return "<encrypted>";
   }
 }
