@@ -18,6 +18,7 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [myUUID] = useState(sessionStorage.getItem("user_id")!);
+  const [waitingForRecipient, setWaitingForRecipient] = useState(true);
 
   const socketRef = useRef<WebSocket | null>(null);
   const myPublicKeyRef = useRef<CryptoKey | null>(null);
@@ -40,22 +41,30 @@ function Chat() {
     socketRef.current!.send(payload);
   }
 
+  async function demandPublicKey() {
+    setWaitingForRecipient(true);
+
+    const payload = JSON.stringify({
+      type: "public_key_demand",
+      ownerUUID: myUUID,
+    });
+    socketRef.current!.send(payload);
+    await new Promise<void>((resolve) => {
+      const interval = setInterval(() => {
+        if (recipientPublicKeyRef.current) {
+          clearInterval(interval);
+          setWaitingForRecipient(false);
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
   async function handleSendMessage() {
     if (!message || !socketRef.current) return;
+
     if (!recipientPublicKeyRef.current) {
-      const payload = JSON.stringify({
-        type: "public_key_demand",
-        ownerUUID: myUUID,
-      });
-      socketRef.current.send(payload);
-      await new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
-          if (recipientPublicKeyRef.current) {
-            clearInterval(interval);
-            resolve();
-          }
-        }, 50);
-      });
+      await demandPublicKey();
     }
 
     const encryptedBase64 = await encryptMessage(
@@ -89,9 +98,10 @@ function Chat() {
   async function handlePublicKey(data: any) {
     const publicKey = await importPublicKey(data.key);
     recipientPublicKeyRef.current = publicKey;
+    setWaitingForRecipient(false);
   }
 
-  async function handleMessage(data: any) {
+  async function handleIncomingMessage(data: any) {
     if (!myPrivateKeyRef.current) return;
     const decrypted = await decryptMessage(
       data.message,
@@ -106,7 +116,7 @@ function Chat() {
   async function handleReceiveMessage(event: MessageEvent) {
     const data = JSON.parse(event.data);
     if (data.ownerUUID === myUUID) return;
-    if (data.type === "message") await handleMessage(data);
+    if (data.type === "message") await handleIncomingMessage(data);
     if (data.type === "public_key") await handlePublicKey(data);
     if (data.type === "public_key_demand") await handlePublicKeyDemand();
   }
@@ -117,6 +127,7 @@ function Chat() {
       socketRef.current = ws;
       setupKeys();
       console.log("WebSocket connection established");
+      demandPublicKey();
     };
     ws.onmessage = handleReceiveMessage;
     ws.onerror = (error) => console.error("WebSocket error:", error);
@@ -139,6 +150,9 @@ function Chat() {
           </div>
         ))}
       </div>
+      {waitingForRecipient && (
+        <div className="waiting-label">Waiting for recipient to connect...</div>
+      )}
       <input
         type="text"
         value={message}

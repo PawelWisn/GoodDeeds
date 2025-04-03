@@ -13,6 +13,13 @@
   width: 80%;
   margin: auto;
 
+  .waiting-label {
+    color: #ff9800;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
   #chat-log {
     flex-grow: 1;
     width: 100%;
