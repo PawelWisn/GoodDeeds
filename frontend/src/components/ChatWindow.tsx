@@ -96,9 +96,13 @@ function Chat() {
   }
 
   async function handlePublicKey(data: any) {
-    const publicKey = await importPublicKey(data.key);
+    let publicKey: CryptoKey | null = null;
+    if (data.key) {
+      publicKey = await importPublicKey(data.key);
+    }
     recipientPublicKeyRef.current = publicKey;
-    setWaitingForRecipient(false);
+
+    setWaitingForRecipient(recipientPublicKeyRef.current === null);
   }
 
   async function handleIncomingMessage(data: any) {
