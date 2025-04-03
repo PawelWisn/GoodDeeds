@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
+import axiosClient from "../utils/axiosInstance";
 import "./ChatRoomCard.scss";
 
 interface ChatRoomCardProps {
@@ -16,9 +17,19 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleCardClick = () => {
-    navigate(`/chats/${id}`);
+  const handleCardClick = async () => {
+    try {
+      const response = await axiosClient.post(`/chats/${id}/join/`);
+      if (response.status === 200) {
+        navigate(`/chats/${id}`);
+      }
+    } catch (error: any) {
+      const apiErrorMessage =
+        error.response?.data?.error || "An unexpected error occurred.";
+      setErrorMessage(apiErrorMessage);
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -34,6 +45,7 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
           ✕
         </button>
       )}
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
     </div>
   );
 };
