@@ -123,20 +123,12 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
-        "drf_social_oauth2.authentication.SocialAuthentication",
+        "users.authentication.GoogleIDTokenCookieAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
-
-AUTHENTICATION_BACKENDS = (
-    "social_core.backends.google.GoogleOAuth2",
-    "drf_social_oauth2.backends.DjangoOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
-)
-
 
 GOOGLE_OAUTH2_TOKEN_INFO_URI = os.getenv("GOOGLE_OAUTH2_TOKEN_INFO_URI")
 
