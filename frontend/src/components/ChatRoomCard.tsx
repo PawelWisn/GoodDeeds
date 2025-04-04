@@ -26,9 +26,13 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
         navigate(`/chats/${id}`);
       }
     } catch (error: any) {
-      const apiErrorMessage =
-        error.response?.data?.error || "An unexpected error occurred.";
-      setErrorMessage(apiErrorMessage);
+      if (error.response?.status === 401) {
+        navigate("/login");
+      } else {
+        setErrorMessage(
+          error.response?.data?.error || "An unexpected error occurred",
+        );
+      }
     }
   };
 

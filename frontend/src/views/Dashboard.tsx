@@ -1,5 +1,6 @@
 import "../index.scss";
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import ListChatRooms from "../components/ListChatRooms";
 import NewChatRoom from "../components/NewChatRoom";
@@ -12,6 +13,7 @@ interface ChatRoom {
 
 function Dashboard() {
   const [chatRooms, setChatRooms] = useState([]);
+  const location = useLocation();
 
   const fetchChatRooms = () => {
     axiosClient.get("/chats/").then((response) => {
@@ -20,21 +22,22 @@ function Dashboard() {
   };
 
   const handleDeleteChatRoom = (id: number) => {
-    axiosClient
-      .delete(`/chats/${id}/`)
-      .then(() => {
-        setChatRooms((prevRooms) =>
-          prevRooms.filter((room: ChatRoom) => room.id !== id),
-        );
-      })
-      .catch((error) => {
-        console.error("Failed to delete chat room:", error);
-      });
+    axiosClient.delete(`/chats/${id}/`).then(() => {
+      setChatRooms((prevRooms) =>
+        prevRooms.filter((room: ChatRoom) => room.id !== id),
+      );
+    });
   };
 
   useEffect(() => {
     fetchChatRooms();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.refresh) {
+      fetchChatRooms();
+    }
+  }, [location.state]);
 
   return (
     <div>

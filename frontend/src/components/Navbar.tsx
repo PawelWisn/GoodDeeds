@@ -26,8 +26,9 @@ const Navbar: React.FC = () => {
       navigate("/login");
     });
   };
+
   const redirectToDashboard = () => {
-    navigate("/dashboard");
+    navigate("/dashboard", { state: { refresh: true } });
   };
 
   return (
