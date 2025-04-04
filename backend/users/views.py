@@ -51,7 +51,6 @@ class VerifyAuthView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        print(request.user, request.user.is_authenticated)
         if request.user.is_authenticated:
             return Response(status=HTTP_204_NO_CONTENT)
 
