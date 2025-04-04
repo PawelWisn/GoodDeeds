@@ -15,6 +15,10 @@ function Dashboard() {
   const [chatRooms, setChatRooms] = useState([]);
   const location = useLocation();
 
+  const initial = () => {
+    fetchChatRooms();
+  };
+
   const fetchChatRooms = () => {
     axiosClient.get("/chats/").then((response) => {
       setChatRooms(response.data);
@@ -29,13 +33,11 @@ function Dashboard() {
     });
   };
 
-  useEffect(() => {
-    fetchChatRooms();
-  }, []);
+  useEffect(initial, []);
 
   useEffect(() => {
     if (location.state?.refresh) {
-      fetchChatRooms();
+      initial();
     }
   }, [location.state]);
 
