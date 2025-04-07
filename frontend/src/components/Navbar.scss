@@ -7,43 +7,43 @@
   align-items: center;
   padding: 0.8rem 1rem;
   background-color: v.$navbar-bg;
-}
 
-#nav-app-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-}
+  .nav-app-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
 
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-#nav-user-name {
-  font-size: 1rem;
-  color: #fff;
-}
+    .nav-user-name {
+      font-size: 1rem;
+      color: #fff;
+    }
 
-.recipient-avatar {
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid silver;
-}
+    .recipient-avatar {
+      width: v.$avatar-width;
+      height: v.$avatar-height;
+      border-radius: v.$avatar-br;
+      object-fit: v.$avatar-object-fit;
+      border: v.$avatar-border;
+    }
+  }
 
-button {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: v.$red-button-bg;
-  color: #fff;
-  border: none;
-  border-radius: 0.4rem;
-  cursor: pointer;
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: v.$red-button-bg;
+    color: #fff;
+    border: none;
+    border-radius: 0.4rem;
+    cursor: pointer;
 
-  &:hover {
-    background-color: color.adjust(v.$red-button-bg, $lightness: 10%);
+    &:hover {
+      background-color: color.adjust(v.$red-button-bg, $lightness: 10%);
+    }
   }
 }

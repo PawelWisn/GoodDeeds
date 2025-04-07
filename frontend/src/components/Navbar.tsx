@@ -38,11 +38,11 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="navbar">
-      <div id="nav-app-name" onClick={redirectToDashboard}>
+      <div className="nav-app-name" onClick={redirectToDashboard}>
         GoodDeeds
       </div>
       <div className="navbar-right">
-        <div id="nav-user-name">{userName || ""}</div>
+        <div className="nav-user-name">{userName || ""}</div>
         {userAvatar && (
           <img
             className="recipient-avatar"

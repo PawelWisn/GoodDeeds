@@ -21,6 +21,43 @@
     text-align: center;
   }
 
+  #room-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0.5rem;
+    margin-bottom: 0.3rem;
+    color: silver;
+
+    .recipient-info {
+      position: absolute;
+      left: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0;
+
+      .recipient-avatar {
+        width: v.$avatar-width;
+        height: v.$avatar-height;
+        border-radius: v.$avatar-br;
+        object-fit: v.$avatar-object-fit;
+        border: v.$avatar-border;
+      }
+
+      .recipient-name {
+        font-size: 1rem;
+        font-weight: bold;
+        margin: 0;
+      }
+    }
+
+    .chat-name-header {
+      font-size: 1.5rem;
+      font-style: italic;
+    }
+  }
+
   #chat-log {
     flex-grow: 1;
     width: 100%;
@@ -28,6 +65,7 @@
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
+    overflow-y: auto;
     background-color: v.$chat-card-bg;
     color: #333;
     overflow-y: auto;
@@ -83,31 +121,6 @@
 
     &:hover {
       background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
-    }
-  }
-
-  .recipient-info {
-    position: absolute; /* Position it relative to the chat container */
-    top: 1rem; /* Adjust the top margin */
-    left: 1rem; /* Move it to the left edge */
-    display: flex;
-    align-items: center;
-    gap: 1rem; /* Add spacing between avatar and name */
-    padding: 0.5rem 1rem;
-
-    .recipient-avatar {
-      width: 2.5rem; /* Use rem for size */
-      height: 2.5rem; /* Ensure the height matches the width */
-      border-radius: 50%; /* Makes the image circular */
-      object-fit: cover; /* Ensures the image scales properly */
-      border: 0.125rem solid #ddd; /* Subtle border */
-    }
-
-    .recipient-name {
-      font-size: 1rem; /* Use rem for font size */
-      font-weight: bold;
-      color: #333; /* Key color */
-      margin: 0;
     }
   }
 }

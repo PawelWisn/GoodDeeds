@@ -178,7 +178,7 @@ function Chat() {
 
   return (
     <div className="chat-container">
-      <div className="room-bar">
+      <div id="room-bar">
         <div className="recipient-info">
           {recipientAvatar && (
             <img
@@ -189,9 +189,7 @@ function Chat() {
           )}
           <p className="recipient-name">{recipientName}</p>
         </div>
-        <div className="chat-name-header">
-          <h2>{roomName}</h2>
-        </div>
+        <div className="chat-name-header">{roomName}</div>
       </div>
       <div id="chat-log">
         {chatLog.map((msg, index) => (
