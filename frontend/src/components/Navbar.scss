@@ -1,43 +1,49 @@
 @use "../variables" as v;
 @use "sass:color";
 
-nav {
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1rem;
   background-color: v.$navbar-bg;
-  color: v.$card-color;
+}
 
-  #nav-app-name {
-    font-size: 1.5rem;
-    font-weight: bold;
+#nav-app-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    &:hover {
-      cursor: pointer;
-    }
-  }
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
-  button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    background-color: v.$red-button-bg;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    &:hover {
-      background-color: color.adjust(v.$red-button-bg, $lightness: 10%);
-    }
-  }
+#nav-user-name {
+  font-size: 1rem;
+  color: #fff;
+}
 
-  #nav-user-name {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    font-style: italic;
-    text-align: center;
+.recipient-avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid silver;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: v.$red-button-bg;
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color.adjust(v.$red-button-bg, $lightness: 10%);
   }
 }

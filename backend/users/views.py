@@ -36,7 +36,13 @@ class GoogleLoginView(APIView):
         user, _ = get_user_model().objects.get_or_create(sub=data["sub"])
 
         max_age = int(data["exp"]) - int(datetime.now(timezone.utc).timestamp())
-        response = Response({"user_id": user.id, "user_name": data.get("name")})
+        response = Response(
+            {
+                "user_id": user.id,
+                "user_name": data.get("name"),
+                "user_avatar": data.get("picture"),
+            }
+        )
         response.set_cookie(
             key="id_token",
             value=id_token,
@@ -61,7 +67,11 @@ class VerifyAuthView(APIView):
 
 class AboutMeView(APIView):
     def get(self, request):
-        data = {"user_id": request.user.id, "user_name": request.data["name"]}
+        data = {
+            "user_id": request.user.id,
+            "user_name": request.auth_token_data.get("name"),
+            "user_avatar": request.auth_token_data.get("picture"),
+        }
         return Response(data)
 
 

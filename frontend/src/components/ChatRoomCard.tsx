@@ -23,7 +23,7 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
     try {
       const response = await axiosClient.post(`/chats/${id}/join/`);
       if (response.status === 200) {
-        navigate(`/chats/${id}`);
+        navigate(`/chats/${id}`, { state: { roomName: name } });
       }
     } catch (error: any) {
       if (error.response?.status === 401) {

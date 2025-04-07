@@ -4,6 +4,7 @@
 .chat-container {
   display: flex;
   flex-direction: column;
+  position: relative;
   align-items: center;
   justify-content: space-between;
   height: 85vh;
@@ -82,6 +83,31 @@
 
     &:hover {
       background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
+    }
+  }
+
+  .recipient-info {
+    position: absolute; /* Position it relative to the chat container */
+    top: 1rem; /* Adjust the top margin */
+    left: 1rem; /* Move it to the left edge */
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Add spacing between avatar and name */
+    padding: 0.5rem 1rem;
+
+    .recipient-avatar {
+      width: 2.5rem; /* Use rem for size */
+      height: 2.5rem; /* Ensure the height matches the width */
+      border-radius: 50%; /* Makes the image circular */
+      object-fit: cover; /* Ensures the image scales properly */
+      border: 0.125rem solid #ddd; /* Subtle border */
+    }
+
+    .recipient-name {
+      font-size: 1rem; /* Use rem for font size */
+      font-weight: bold;
+      color: #333; /* Key color */
+      margin: 0;
     }
   }
 }

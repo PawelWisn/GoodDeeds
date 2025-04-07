@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import "./ChatWindow.scss";
+import { format } from "date-fns";
+import { useLocation } from "react-router";
 import {
   generateKeys,
   importPublicKey,
@@ -11,13 +13,19 @@ import {
 interface ChatMessage {
   text: string;
   isOwnMessage: boolean;
+  timestamp: string;
 }
 
 function Chat() {
+  const location = useLocation();
+  const roomName = location.state?.roomName;
   const { id: roomId } = useParams<{ id: string }>();
+
   const [message, setMessage] = useState("");
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [myUUID] = useState(sessionStorage.getItem("user_id")!);
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientAvatar, setRecipientAvatar] = useState("");
   const [waitingForRecipient, setWaitingForRecipient] = useState(true);
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -37,6 +45,8 @@ function Chat() {
       type: "public_key",
       key: publicKeyBase64,
       ownerUUID: myUUID,
+      ownerName: sessionStorage.getItem("user_name"),
+      ownerAvatar: sessionStorage.getItem("user_avatar"),
     });
     socketRef.current!.send(payload);
   }
@@ -71,16 +81,18 @@ function Chat() {
       message,
       recipientPublicKeyRef.current!,
     );
+    const timestamp = format(new Date(), "dd.MM.yyyy HH:mm:ss");
     const payload = JSON.stringify({
       type: "message",
       message: encryptedBase64,
       ownerUUID: myUUID,
+      timestamp: timestamp,
     });
     socketRef.current.send(payload);
 
     setChatLog((prevLog) => [
       ...prevLog,
-      { text: message, isOwnMessage: true },
+      { text: message, timestamp: timestamp, isOwnMessage: true },
     ]);
     setMessage("");
   }
@@ -91,6 +103,8 @@ function Chat() {
       type: "public_key",
       key: myPublicKeyBase64Ref.current,
       ownerUUID: myUUID,
+      ownerName: sessionStorage.getItem("user_name"),
+      ownerAvatar: sessionStorage.getItem("user_avatar"),
     });
     socketRef.current.send(payload);
   }
@@ -101,6 +115,26 @@ function Chat() {
       publicKey = await importPublicKey(data.key);
     }
     recipientPublicKeyRef.current = publicKey;
+    setRecipientName(data.ownerName);
+
+    const cachedAvatar = sessionStorage.getItem(`avatar_${data.ownerUUID}`);
+    if (cachedAvatar) {
+      setRecipientAvatar(cachedAvatar);
+    } else if (data.ownerAvatar) {
+      try {
+        const response = await fetch(data.ownerAvatar);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          sessionStorage.setItem(`avatar_${data.ownerUUID}`, base64data);
+          setRecipientAvatar(base64data);
+        };
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error("Failed to fetch avatar:", error);
+      }
+    }
 
     setWaitingForRecipient(recipientPublicKeyRef.current === null);
   }
@@ -113,7 +147,7 @@ function Chat() {
     );
     setChatLog((prevLog) => [
       ...prevLog,
-      { text: decrypted, isOwnMessage: false },
+      { text: decrypted, timestamp: data.timestamp, isOwnMessage: false },
     ]);
   }
 
@@ -144,10 +178,26 @@ function Chat() {
 
   return (
     <div className="chat-container">
+      <div className="room-bar">
+        <div className="recipient-info">
+          {recipientAvatar && (
+            <img
+              className="recipient-avatar"
+              src={recipientAvatar}
+              alt="Recipient Avatar"
+            />
+          )}
+          <p className="recipient-name">{recipientName}</p>
+        </div>
+        <div className="chat-name-header">
+          <h2>{roomName}</h2>
+        </div>
+      </div>
       <div id="chat-log">
         {chatLog.map((msg, index) => (
           <div
             key={index}
+            title={msg.timestamp}
             className={`chat-message ${msg.isOwnMessage ? "own-message" : "incoming-message"}`}
           >
             {msg.text}

@@ -14,9 +14,30 @@ function LoginForm() {
     if (response.credential) {
       axiosClient
         .post("/users/google_login_react/", { id_token: response.credential })
-        .then((response) => {
-          sessionStorage.setItem("user_id", response.data.user_id);
-          sessionStorage.setItem("user_name", response.data.user_name);
+        .then(async (response) => {
+          const { user_id, user_name, user_avatar } = response.data;
+
+          sessionStorage.setItem("user_id", user_id);
+          sessionStorage.setItem("user_name", user_name);
+
+          const cachedAvatar = sessionStorage.getItem("user_avatar_cache");
+          if (cachedAvatar) {
+            sessionStorage.setItem("user_avatar", cachedAvatar);
+          } else {
+            try {
+              const avatarResponse = await fetch(user_avatar);
+              const blob = await avatarResponse.blob();
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const base64data = reader.result as string;
+                sessionStorage.setItem("user_avatar_cache", base64data);
+                sessionStorage.setItem("user_avatar", base64data);
+              };
+              reader.readAsDataURL(blob);
+            } catch (error) {
+              sessionStorage.setItem("user_avatar", user_avatar);
+            }
+          }
           navigate("/dashboard");
         })
         .catch(() => {
