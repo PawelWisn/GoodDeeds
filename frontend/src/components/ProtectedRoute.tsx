@@ -24,12 +24,10 @@ const ProtectedRoute: React.FC = () => {
 
   if (isAuthenticated === true) {
     return (
-      <div>
+      <>
         <Navbar />
-        <main>
-          <Outlet />
-        </main>
-      </div>
+        <Outlet />
+      </>
     );
   } else {
     return <Navigate to="/login" replace />;

@@ -1,9 +1,11 @@
+import "./Dashboard.scss";
 import "../index.scss";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import ListChatRooms from "../components/ListChatRooms";
 import NewChatRoom from "../components/NewChatRoom";
+import UserList from "../components/UserList";
 
 interface ChatRoom {
   id: number;
@@ -12,7 +14,7 @@ interface ChatRoom {
 }
 
 function Dashboard() {
-  const [chatRooms, setChatRooms] = useState([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const location = useLocation();
 
   const initial = () => {
@@ -42,9 +44,12 @@ function Dashboard() {
   }, [location.state]);
 
   return (
-    <div>
-      <NewChatRoom onChatRoomCreated={fetchChatRooms} />
-      <ListChatRooms chatRooms={chatRooms} onDelete={handleDeleteChatRoom} />
+    <div className="dashboard">
+      <div className="main-content">
+        <NewChatRoom onChatRoomCreated={fetchChatRooms} />
+        <ListChatRooms chatRooms={chatRooms} onDelete={handleDeleteChatRoom} />
+      </div>
+      <UserList />
     </div>
   );
 }

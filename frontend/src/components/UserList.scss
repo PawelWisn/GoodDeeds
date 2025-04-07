@@ -1,0 +1,52 @@
+@use "../variables" as v;
+@use "sass:color";
+
+.user-list {
+  width: 15rem;
+  background-color: v.$card-bg;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: v.$card-color;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: color.adjust(v.$card-bg, $lightness: 10%);
+      }
+
+      .user-avatar {
+        width: v.$avatar-width;
+        height: v.$avatar-height;
+        border-radius: v.$avatar-br;
+        object-fit: v.$avatar-object-fit;
+        border: v.$avatar-border;
+      }
+
+      .user-name {
+        font-size: 1rem;
+      }
+    }
+  }
+}

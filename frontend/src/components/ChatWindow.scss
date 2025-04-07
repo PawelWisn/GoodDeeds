@@ -13,6 +13,7 @@
   color: v.$card-bg;
   width: 80%;
   margin: auto;
+  height: calc(100vh - v.$navbar-height);
 
   .waiting-label {
     color: yellow;

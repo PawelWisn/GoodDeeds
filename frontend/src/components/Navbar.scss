@@ -2,6 +2,7 @@
 @use "sass:color";
 
 .navbar {
+  height: v.$navbar-height;
   display: flex;
   justify-content: space-between;
   align-items: center;
