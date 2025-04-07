@@ -179,3 +179,16 @@ LOGGING = {
 
 
 AUTH_USER_MODEL = "users.User"
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_CACHE_URI"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "gd_",
+        "TIMEOUT": 7200,
+    }
+}

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.middleware.csrf import get_token
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -50,6 +51,17 @@ class GoogleLoginView(APIView):
             samesite="Strict",
             max_age=max_age,
         )
+
+        cache.set(
+            f"user_{user.id}",
+            {
+                "id": user.id,
+                "name": data.get("name"),
+                "avatar": data.get("picture"),
+            },
+            timeout=max_age,
+        )
+
         return response
 
 
@@ -77,6 +89,15 @@ class AboutMeView(APIView):
 
 class LogoutView(APIView):
     def post(self, request):
+        cache.delete(f"user_{request.user.id}")
         response = Response(status=HTTP_204_NO_CONTENT)
         response.delete_cookie("id_token")
         return response
+
+
+class LoggedInUsersView(APIView):
+    def get(self, request):
+        user_keys = cache.keys("user_*")
+        users = [cache.get(key) for key in user_keys]
+
+        return Response(users, status=HTTP_200_OK)
