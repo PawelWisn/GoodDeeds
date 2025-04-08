@@ -1,6 +1,7 @@
 from chat.models import ChatRoom
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_405_METHOD_NOT_ALLOWED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
 
@@ -20,6 +21,10 @@ class ChatRoomsListView(APIView):
     def post(self, request):
         room_name = request.data.get("name")
         private_room = request.data.get("private_room", False)
+        recipient_id = request.data.get("recipient_id")
+
+        if (private_room and not recipient_id) or (not private_room and recipient_id):
+            return Response({"error": "Invalid parameters"}, status=HTTP_400_BAD_REQUEST)
 
         if not room_name:
             return Response({"error": "Missing room name"}, status=HTTP_400_BAD_REQUEST)
@@ -33,6 +38,11 @@ class ChatRoomsListView(APIView):
 
         chat = ChatRoom.objects.create(name=room_name, created_by=request.user, private_room=private_room)
         chat.members.add(request.user)
+        if private_room and recipient_id:
+            recipient_user = get_user_model().objects.filter(id=recipient_id).first()
+            if not recipient_user:
+                return Response({"error": "Recipient not found"}, status=HTTP_400_BAD_REQUEST)
+            chat.members.add(recipient_user)
 
         return Response({"id": chat.id, "name": room_name}, status=HTTP_201_CREATED)
 
@@ -64,3 +74,11 @@ class JoinChatRoomView(APIView):
 
         chat.members.add(request.user)
         return Response({"message": "User successfully added to the chat room"}, status=HTTP_200_OK)
+
+
+class PrivateRoomCheckView(APIView):
+    def get(self, request, recipient_id):
+        private_room = ChatRoom.objects.filter(private_room=True, members__in=[request.user]).filter(members__in=[recipient_id]).first()
+        if private_room:
+            return Response({"id": private_room.id, "name": private_room.name})
+        return Response({"error": "No private room found"}, status=HTTP_404_NOT_FOUND)
