@@ -97,7 +97,8 @@ class LogoutView(APIView):
 
 class LoggedInUsersView(APIView):
     def get(self, request):
+        my_key = f"user_{request.user.id}"
         user_keys = cache.keys("user_*")
-        users = [cache.get(key) for key in user_keys]
+        users = [cache.get(key) for key in user_keys if key != my_key]
 
         return Response(users, status=HTTP_200_OK)

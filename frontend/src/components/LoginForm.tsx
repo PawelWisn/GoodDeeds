@@ -1,5 +1,5 @@
 import "./LoginForm.scss";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";
@@ -9,6 +9,10 @@ const login_failed_msg = "Login failed. Please try again";
 function LoginForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   let navigate = useNavigate();
+
+  useEffect(() => {
+    sessionStorage.clear();
+  }, []);
 
   const responseMessage = (response: { credential?: string }) => {
     if (response.credential) {

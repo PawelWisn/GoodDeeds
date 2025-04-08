@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 class ChatRoomsListView(APIView):
     def get(self, request):
-        available_rooms = ChatRoom.objects.available_to_user(request.user).order_by("-created_at")
+        available_rooms = ChatRoom.objects.available_to_user(request.user).filter(private_room=False).order_by("-created_at")
         response_data = [
             {
                 "id": room.id,
@@ -19,6 +19,7 @@ class ChatRoomsListView(APIView):
 
     def post(self, request):
         room_name = request.data.get("name")
+        private_room = request.data.get("private_room", False)
 
         if not room_name:
             return Response({"error": "Missing room name"}, status=HTTP_400_BAD_REQUEST)
@@ -30,7 +31,7 @@ class ChatRoomsListView(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        chat = ChatRoom.objects.create(name=room_name, created_by=request.user)
+        chat = ChatRoom.objects.create(name=room_name, created_by=request.user, private_room=private_room)
         chat.members.add(request.user)
 
         return Response({"id": chat.id, "name": room_name}, status=HTTP_201_CREATED)

@@ -19,17 +19,24 @@ const UserList: React.FC = () => {
     });
   }, []);
 
-  const handleUserClick = async (userId: number) => {
-    try {
-      const response = await axiosClient.post(`/chats/qwe/`, {
-        user_id: userId,
+  const handleUserClick = async () => {
+    const user_name = sessionStorage.getItem("user_name");
+    const room_name = user_name ? `${user_name}'s room` : "Private room";
+    await axiosClient
+      .post("/chats/", { name: room_name, private_room: true })
+      .then((response) => {
+        const new_chat_id = response.data.id;
+        axiosClient
+          .post(`/chats/${new_chat_id}/join/`)
+          .then(() => {
+            navigate(`/chats/${new_chat_id}`, {
+              state: { roomName: room_name },
+            });
+          })
+          .catch(() => {
+            navigate("/login");
+          });
       });
-      const { room_id } = response.data;
-
-      navigate(`/chats/${room_id}`);
-    } catch (error) {
-      console.error("Failed to create chat room:", error);
-    }
   };
 
   return (
@@ -37,7 +44,7 @@ const UserList: React.FC = () => {
       <h3>Users</h3>
       <ul>
         {users.map((user) => (
-          <li key={user.id} onClick={() => handleUserClick(user.id)}>
+          <li key={user.id} onClick={() => handleUserClick()}>
             <span className="user-name">{user.name}</span>
           </li>
         ))}

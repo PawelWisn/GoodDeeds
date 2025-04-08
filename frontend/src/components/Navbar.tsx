@@ -27,7 +27,6 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     axiosClient.post("/users/logout/").then(() => {
-      sessionStorage.clear();
       navigate("/login");
     });
   };
