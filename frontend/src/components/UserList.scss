@@ -11,10 +11,24 @@
   flex-direction: column;
   overflow-y: auto;
 
-  h3 {
+  .user-list-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 1rem;
-    font-size: 1.2rem;
-    text-align: center;
+
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .silver-bar {
+      width: 100%;
+      height: 1px;
+      background-color: silver;
+      margin-top: 0.5rem;
+    }
   }
 
   ul {

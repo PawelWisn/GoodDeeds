@@ -63,7 +63,10 @@ const UserList: React.FC = () => {
 
   return (
     <div className="user-list">
-      <h3>Users</h3>
+      <div className="user-list-header">
+        <h3>Users</h3>
+        <div className="silver-bar"></div>
+      </div>
       <ul>
         {users.map((user) => (
           <li key={user.id} onClick={() => handleUserClick(user.id, user.name)}>
