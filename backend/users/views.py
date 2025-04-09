@@ -120,7 +120,13 @@ class NotificationView(APIView):
                 key = f"notification_{recipient.id}"
                 user_name = request.auth_token_data.get("name") or "Someone"
                 message = f"{user_name} wants to chat with you"
-                notification_data = {"notification": message, "room_id": room_id, "room_name": chat.name}
+                notification_data = {
+                    "notification": message,
+                    "room_id": room_id,
+                    "room_name": chat.name,
+                    "inviter": user_name,
+                    "private_room": chat.private_room,
+                }
                 cache.set(key, notification_data, timeout=3600)
             return Response(status=HTTP_204_NO_CONTENT)
         return Response({"error": "Chat room not found"}, status=HTTP_404_NOT_FOUND)

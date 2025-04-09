@@ -19,8 +19,11 @@ const UserList: React.FC = () => {
     });
   }, []);
 
-  const handleUserClick = async (recipient_id: number) => {
-    const roomName = "Private room";
+  const handleUserClick = async (
+    recipient_id: number,
+    recipient_name: string,
+  ) => {
+    const roomName = "Private room with " + recipient_name;
 
     try {
       const response = await axiosClient.get(
@@ -70,7 +73,7 @@ const UserList: React.FC = () => {
       </div>
       <ul>
         {users.map((user) => (
-          <li key={user.id} onClick={() => handleUserClick(user.id)}>
+          <li key={user.id} onClick={() => handleUserClick(user.id, user.name)}>
             <span className="user-name">{user.name}</span>
           </li>
         ))}

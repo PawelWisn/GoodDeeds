@@ -19,7 +19,7 @@ interface ChatMessage {
 
 function Chat() {
   const location = useLocation();
-  const roomName = location.state?.roomName;
+  const roomName = location.state?.roomName || "Chat Room";
   const { id: roomId } = useParams<{ id: string }>();
 
   const [message, setMessage] = useState("");
@@ -28,6 +28,7 @@ function Chat() {
   const [recipientName, setRecipientName] = useState("");
   const [recipientAvatar, setRecipientAvatar] = useState("");
   const [waitingForRecipient, setWaitingForRecipient] = useState(true);
+  const [demandingPublicKey, setDemandingPublicKey] = useState(false);
 
   const socketRef = useRef<WebSocket | null>(null);
   const myPublicKeyRef = useRef<CryptoKey | null>(null);
@@ -53,8 +54,9 @@ function Chat() {
   }
 
   async function demandPublicKey() {
+    if (demandingPublicKey) return;
+    setDemandingPublicKey(true);
     setWaitingForRecipient(true);
-
     const payload = JSON.stringify({
       type: "public_key_demand",
       ownerUUID: myUUID,
@@ -65,9 +67,10 @@ function Chat() {
         if (recipientPublicKeyRef.current) {
           clearInterval(interval);
           setWaitingForRecipient(false);
+          setDemandingPublicKey(false);
           resolve();
         }
-      }, 100);
+      }, 500);
     });
   }
 
@@ -116,6 +119,7 @@ function Chat() {
       publicKey = await importPublicKey(data.key);
     }
     recipientPublicKeyRef.current = publicKey;
+    setWaitingForRecipient(false);
     setRecipientName(data.ownerName);
 
     const cachedAvatar = sessionStorage.getItem(`avatar_${data.ownerUUID}`);
@@ -154,13 +158,7 @@ function Chat() {
 
   async function sendNotificationRoomJoined() {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      if (!recipientPublicKeyRef.current) {
-        await axiosClient.post("/users/notifications/", { room_id: roomId });
-      } else {
-        console.log("Recipient public key found, no notification sent");
-      }
+      await axiosClient.post("/users/notifications/", { room_id: roomId });
     } catch (error: any) {
       console.error("Error sending notification:", error.response?.data?.error);
     }
@@ -177,9 +175,9 @@ function Chat() {
   useEffect(() => {
     const ws = new WebSocket(`ws://0.0.0.0:8000/ws/chat/${roomId}/`);
     ws.onopen = () => {
+      console.log("WebSocket connection established");
       socketRef.current = ws;
       setupKeys();
-      console.log("WebSocket connection established");
       demandPublicKey();
       sendNotificationRoomJoined();
     };

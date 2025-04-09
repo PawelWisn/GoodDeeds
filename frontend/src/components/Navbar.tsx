@@ -29,8 +29,18 @@ const Navbar: React.FC = () => {
       const response = await axiosClient.get("/users/notifications/");
       if (response.data.notification) {
         const msg = response.data.notification;
-        const roomName = response.data.room_name;
+        const private_room = response.data.private_room;
+        const roomName = private_room
+          ? "Private room with " + response.data.inviter
+          : response.data.room_name;
         const roomId = response.data.room_id;
+        const roomUrl = `/chats/${roomId}`;
+
+        if (location.pathname === roomUrl) {
+          console.log("Already in the chat room, no toast shown");
+          return;
+        }
+
         toast(
           (t) => (
             <div
@@ -84,8 +94,10 @@ const Navbar: React.FC = () => {
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    console.log("Room joined via notification");
-                    navigate(`/chats/${roomId}`, { state: { roomName } });
+                    navigate("/dashboard", { state: { refresh: true } });
+                    setTimeout(() => {
+                      navigate(roomUrl, { state: { roomName } });
+                    }, 1);
                     toast.remove(t.id);
                   }}
                 >
