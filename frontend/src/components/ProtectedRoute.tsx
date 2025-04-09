@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import Navbar from "./Navbar";
+import { Toaster } from "react-hot-toast";
 
 const ProtectedRoute: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -25,6 +26,16 @@ const ProtectedRoute: React.FC = () => {
   if (isAuthenticated === true) {
     return (
       <>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            className: "",
+            style: {
+              padding: "0",
+              margin: "0",
+            },
+          }}
+        />
         <Navbar />
         <Outlet />
       </>

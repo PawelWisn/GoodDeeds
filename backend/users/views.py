@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 
 import requests
+from chat.models import ChatRoom
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.middleware.csrf import get_token
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
 
@@ -102,3 +103,25 @@ class LoggedInUsersView(APIView):
         users = [cache.get(key) for key in user_keys if key != my_key]
 
         return Response(users, status=HTTP_200_OK)
+
+
+class NotificationView(APIView):
+    def get(self, request):
+        key = f"notification_{request.user.id}"
+        notification_data = cache.get(key)
+        if notification_data:
+            cache.delete(key)
+            return Response(notification_data, status=HTTP_200_OK)
+        return Response({"notification": None, "room_id": None}, status=HTTP_200_OK)
+
+    def post(self, request):
+        room_id = request.data.get("room_id")
+        if chat := ChatRoom.objects.filter(id=room_id).first():
+            if recipient := chat.members.exclude(id=request.user.id).first():
+                key = f"notification_{recipient.id}"
+                user_name = request.auth_token_data.get("name") or "Someone"
+                message = f"{user_name} wants to chat with you"
+                notification_data = {"notification": message, "room_id": room_id, "room_name": chat.name}
+                cache.set(key, notification_data, timeout=3600)
+            return Response(status=HTTP_204_NO_CONTENT)
+        return Response({"error": "Chat room not found"}, status=HTTP_404_NOT_FOUND)

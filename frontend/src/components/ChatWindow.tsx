@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import "./ChatWindow.scss";
 import { format } from "date-fns";
 import { useLocation } from "react-router";
+import axiosClient from "../utils/axiosInstance";
 import {
   generateKeys,
   importPublicKey,
@@ -151,6 +152,21 @@ function Chat() {
     ]);
   }
 
+  async function sendNotificationRoomJoined() {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      if (!recipientPublicKeyRef.current) {
+        await axiosClient.post("/users/notifications/", { room_id: roomId });
+        console.log("Notification sent successfully");
+      } else {
+        console.log("Recipient public key found, no notification sent");
+      }
+    } catch (error: any) {
+      console.error("Error sending notification:", error.response?.data?.error);
+    }
+  }
+
   async function handleReceiveMessage(event: MessageEvent) {
     const data = JSON.parse(event.data);
     if (data.ownerUUID === myUUID) return;
@@ -166,6 +182,7 @@ function Chat() {
       setupKeys();
       console.log("WebSocket connection established");
       demandPublicKey();
+      sendNotificationRoomJoined();
     };
     ws.onmessage = handleReceiveMessage;
     ws.onerror = (error) => console.error("WebSocket error:", error);
@@ -196,7 +213,9 @@ function Chat() {
           <div
             key={index}
             title={msg.timestamp}
-            className={`chat-message ${msg.isOwnMessage ? "own-message" : "incoming-message"}`}
+            className={`chat-message ${
+              msg.isOwnMessage ? "own-message" : "incoming-message"
+            }`}
           >
             {msg.text}
           </div>
