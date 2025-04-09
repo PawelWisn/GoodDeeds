@@ -19,8 +19,8 @@ const UserList: React.FC = () => {
     });
   }, []);
 
-  const handleUserClick = async (recipient_id: number, user_name: string) => {
-    const roomName = `Private room with ${user_name}`;
+  const handleUserClick = async (recipient_id: number) => {
+    const roomName = "Private room";
 
     try {
       const response = await axiosClient.get(
@@ -29,9 +29,10 @@ const UserList: React.FC = () => {
       const existingRoom = response.data;
 
       if (existingRoom) {
-        navigate(`/chats/${existingRoom.id}`, {
+        navigate(`/chats/${existingRoom.room_id}`, {
           state: { roomName: roomName },
         });
+        return;
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
@@ -69,7 +70,7 @@ const UserList: React.FC = () => {
       </div>
       <ul>
         {users.map((user) => (
-          <li key={user.id} onClick={() => handleUserClick(user.id, user.name)}>
+          <li key={user.id} onClick={() => handleUserClick(user.id)}>
             <span className="user-name">{user.name}</span>
           </li>
         ))}

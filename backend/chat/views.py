@@ -80,5 +80,5 @@ class PrivateRoomCheckView(APIView):
     def get(self, request, recipient_id):
         private_room = ChatRoom.objects.filter(private_room=True, members__in=[request.user]).filter(members__in=[recipient_id]).first()
         if private_room:
-            return Response({"id": private_room.id, "name": private_room.name})
+            return Response({"room_id": private_room.id, "room_name": private_room.name})
         return Response({"error": "No private room found"}, status=HTTP_404_NOT_FOUND)

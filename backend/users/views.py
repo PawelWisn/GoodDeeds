@@ -108,8 +108,7 @@ class LoggedInUsersView(APIView):
 class NotificationView(APIView):
     def get(self, request):
         key = f"notification_{request.user.id}"
-        notification_data = cache.get(key)
-        if notification_data:
+        if notification_data := cache.get(key):
             cache.delete(key)
             return Response(notification_data, status=HTTP_200_OK)
         return Response({"notification": None, "room_id": None}, status=HTTP_200_OK)

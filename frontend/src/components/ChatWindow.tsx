@@ -158,7 +158,6 @@ function Chat() {
 
       if (!recipientPublicKeyRef.current) {
         await axiosClient.post("/users/notifications/", { room_id: roomId });
-        console.log("Notification sent successfully");
       } else {
         console.log("Recipient public key found, no notification sent");
       }
