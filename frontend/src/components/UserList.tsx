@@ -8,16 +8,12 @@ interface User {
   name: string;
   avatar: string;
 }
+interface ListUsersProps {
+  users: User[];
+}
 
-const UserList: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+const UserList: React.FC<ListUsersProps> = ({ users }) => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    axiosClient.get("/users/logged_in/").then((response) => {
-      setUsers(response.data);
-    });
-  }, []);
 
   const handleUserClick = async (
     recipient_id: number,

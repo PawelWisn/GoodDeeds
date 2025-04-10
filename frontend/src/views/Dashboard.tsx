@@ -12,18 +12,31 @@ interface ChatRoom {
   name: string;
   can_delete: boolean;
 }
+interface User {
+  id: number;
+  name: string;
+  avatar: string;
+}
 
 function Dashboard() {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const location = useLocation();
 
   const initial = () => {
     fetchChatRooms();
+    fetchUsersRooms();
   };
 
   const fetchChatRooms = () => {
     axiosClient.get("/chats/").then((response) => {
       setChatRooms(response.data);
+    });
+  };
+
+  const fetchUsersRooms = () => {
+    axiosClient.get("/users/logged_in/").then((response) => {
+      setUsers(response.data);
     });
   };
 
@@ -49,7 +62,7 @@ function Dashboard() {
         <NewChatRoom onChatRoomCreated={fetchChatRooms} />
         <ListChatRooms chatRooms={chatRooms} onDelete={handleDeleteChatRoom} />
       </div>
-      <UserList />
+      <UserList users={users} />
     </div>
   );
 }
