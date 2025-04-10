@@ -1,14 +1,12 @@
 import "../styles/LoginForm.scss";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";
 import { useWebSocket } from "../toasts/ToastsWebSocketProvider";
-
-const login_failed_msg = "Login failed. Please try again";
+import toast from "react-hot-toast";
 
 function LoginForm() {
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   let navigate = useNavigate();
   const { handleStorageChange } = useWebSocket();
 
@@ -58,7 +56,7 @@ function LoginForm() {
   };
 
   const errorMessage = () => {
-    setErrorMsg(login_failed_msg);
+    toast.error("Login failed. Please try again");
   };
 
   return (
@@ -67,7 +65,6 @@ function LoginForm() {
       <div id={"google-login-button"}>
         <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
       </div>
-      {errorMsg && <div className={"error-message"}>{errorMsg}</div>}
     </div>
   );
 }

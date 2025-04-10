@@ -1,6 +1,7 @@
 from chat.models import ChatRoom
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.utils.html import strip_tags
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_409_CONFLICT
 from rest_framework.views import APIView
@@ -20,7 +21,7 @@ class ChatRoomsListView(APIView):
         return Response(response_data, status=HTTP_200_OK)
 
     def post(self, request):
-        room_name = request.data.get("name")
+        room_name = strip_tags(request.data["name"])
         private_room = request.data.get("private_room", False)
         recipient_id = request.data.get("recipient_id")
 
