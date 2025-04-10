@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import "./ChatWindow.scss";
 import { format } from "date-fns";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
+import toast from "react-hot-toast";
 import {
   generateKeys,
   importPublicKey,
@@ -19,6 +20,7 @@ interface ChatMessage {
 
 function Chat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const roomName = location.state?.roomName || "Chat Room";
   const { id: roomId } = useParams<{ id: string }>();
 
@@ -161,6 +163,11 @@ function Chat() {
       await axiosClient.post("/users/notifications/", { room_id: roomId });
     } catch (error: any) {
       console.error("Error sending notification:", error.response?.data?.error);
+      const error_msg = error.response?.data?.error;
+      if (error_msg) {
+        toast.error(error_msg);
+        navigate("/dashboard");
+      }
     }
   }
 

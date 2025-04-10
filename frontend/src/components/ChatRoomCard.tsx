@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import "./ChatRoomCard.scss";
+import toast from "react-hot-toast";
 
 interface ChatRoomCardProps {
   id: number;
@@ -17,7 +18,6 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleCardClick = async () => {
     try {
@@ -27,9 +27,10 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
+        toast("Session expired, please log in again", { icon: "⚠️" });
         navigate("/login");
       } else {
-        setErrorMessage(
+        toast.error(
           error.response?.data?.error || "An unexpected error occurred",
         );
       }
@@ -49,7 +50,6 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
           ✕
         </button>
       )}
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
     </div>
   );
 };

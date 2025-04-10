@@ -7,6 +7,8 @@ import ListChatRooms from "../components/ListChatRooms";
 import NewChatRoom from "../components/NewChatRoom";
 import UserList from "../components/UserList";
 
+import toast from "react-hot-toast";
+
 interface ChatRoom {
   id: number;
   name: string;
@@ -46,6 +48,7 @@ function Dashboard() {
         prevRooms.filter((room: ChatRoom) => room.id !== id),
       );
     });
+    toast.success("Chat room deleted successfully!");
   };
 
   useEffect(initial, []);

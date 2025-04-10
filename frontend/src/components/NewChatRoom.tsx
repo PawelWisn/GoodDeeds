@@ -1,37 +1,41 @@
 import React, { useState } from "react";
 import axiosClient from "../utils/axiosInstance";
+import { useNavigate } from "react-router";
 import "./NewChatRoom.scss";
+import toast from "react-hot-toast";
 
 interface NewChatRoomProps {
   onChatRoomCreated: () => void;
 }
 
 const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
+  const navigate = useNavigate();
   const [chatRoomName, setChatRoomName] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!chatRoomName.trim()) {
-      setErrorMessage("Chat room name cannot be empty.");
+      toast.error("Chat room name cannot be empty");
       return;
     }
 
     axiosClient
       .post("/chats/", { name: chatRoomName })
       .then(() => {
-        setSuccessMessage("Chat room created successfully!");
-        setErrorMessage(null);
+        toast.success("Chat room created successfully!");
         setChatRoomName("");
         onChatRoomCreated();
       })
       .catch((error) => {
-        setErrorMessage(
-          error.response?.data?.error || "Failed to create chat room.",
-        );
-        setSuccessMessage(null);
+        if (error.response?.status === 401) {
+          toast("Session expired, please log in again", { icon: "⚠️" });
+          navigate("/login");
+        } else {
+          toast.error(
+            error.response?.data?.error || "Failed to create chat room",
+          );
+        }
       });
   };
 
@@ -47,10 +51,6 @@ const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
         />
         <button type="submit">Create</button>
       </form>
-      {successMessage && (
-        <div className="success-message">{successMessage}</div>
-      )}
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
     </div>
   );
 };

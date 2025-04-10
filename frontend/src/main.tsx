@@ -10,6 +10,7 @@ import Chat from "./views/Chat.tsx";
 import "./index.scss";
 import Cookies from "js-cookie";
 import axiosClient from "./utils/axiosInstance";
+import Toasts from "./components/Toasts";
 
 const VITE_GOOGLE_AUTH_KEY = import.meta.env.VITE_GOOGLE_AUTH_KEY;
 
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={VITE_GOOGLE_AUTH_KEY}>
       <BrowserRouter>
+        <Toasts />
         <Routes>
           <Route path="/login" element={<Login />} />
 

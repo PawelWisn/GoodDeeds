@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import "./UserList.scss";
+import toast from "react-hot-toast";
 
 interface User {
   id: number;
@@ -35,6 +36,7 @@ const UserList: React.FC<ListUsersProps> = ({ users }) => {
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
+        toast("Session expired, please log in again", { icon: "⚠️" });
         navigate("/login");
       } else if (error.response?.status === 404) {
         console.log("Not found private room, creating new...", error);
@@ -53,6 +55,7 @@ const UserList: React.FC<ListUsersProps> = ({ users }) => {
       navigate(`/chats/${newRoomId}`, { state: { roomName } });
     } catch (error: any) {
       if (error.response?.status === 401) {
+        toast("Session expired, please log in again", { icon: "⚠️" });
         navigate("/login");
       } else {
         console.error(error.response?.data.message);
