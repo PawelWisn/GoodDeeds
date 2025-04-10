@@ -1,7 +1,8 @@
 from chat.models import ChatRoom
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
 
@@ -80,5 +81,7 @@ class PrivateRoomCheckView(APIView):
     def get(self, request, recipient_id):
         private_room = ChatRoom.objects.filter(private_room=True, members__in=[request.user]).filter(members__in=[recipient_id]).first()
         if private_room:
-            return Response({"room_id": private_room.id, "room_name": private_room.name})
+            if cache.get(f"user_{recipient_id}"):
+                return Response({"room_id": private_room.id, "room_name": private_room.name})
+            return Response({"error": "User has logged out"}, status=HTTP_409_CONFLICT)
         return Response({"error": "No private room found"}, status=HTTP_404_NOT_FOUND)

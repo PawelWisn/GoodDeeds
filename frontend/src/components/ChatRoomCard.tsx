@@ -33,6 +33,7 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
         toast.error(
           error.response?.data?.error || "An unexpected error occurred",
         );
+        navigate("/dashboard", { state: { refresh: true } });
       }
     }
   };

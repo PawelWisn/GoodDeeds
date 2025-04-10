@@ -38,10 +38,10 @@ const UserList: React.FC<ListUsersProps> = ({ users }) => {
       if (error.response?.status === 401) {
         toast("Session expired, please log in again", { icon: "⚠️" });
         navigate("/login");
-      } else if (error.response?.status === 404) {
-        console.log("Not found private room, creating new...", error);
-      } else {
-        console.error("Error fetching existign private room:", error);
+      } else if (error.response?.status === 409) {
+        toast.error(error.response?.data?.error || "User is inaccessible");
+        navigate("/dashboard", { state: { refresh: true } });
+        return;
       }
     }
 
