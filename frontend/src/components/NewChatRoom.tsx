@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axiosClient from "../utils/axiosInstance";
 import { useNavigate } from "react-router";
-import "./NewChatRoom.scss";
+import "../styles/NewChatRoom.scss";
 import toast from "react-hot-toast";
 
 interface NewChatRoomProps {

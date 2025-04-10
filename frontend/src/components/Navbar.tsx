@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
-import "./Navbar.scss";
+import "../styles/Navbar.scss";
 
 const Navbar: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);

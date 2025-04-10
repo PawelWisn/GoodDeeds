@@ -1,14 +1,16 @@
-import "./LoginForm.scss";
+import "../styles/LoginForm.scss";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";
+import { useWebSocket } from "../toasts/ToastsWebSocketProvider";
 
 const login_failed_msg = "Login failed. Please try again";
 
 function LoginForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   let navigate = useNavigate();
+  const { handleStorageChange } = useWebSocket();
 
   useEffect(() => {
     sessionStorage.clear();
@@ -23,6 +25,7 @@ function LoginForm() {
 
           sessionStorage.setItem("user_id", user_id);
           sessionStorage.setItem("user_name", user_name);
+          handleStorageChange();
 
           const cachedAvatar = sessionStorage.getItem("user_avatar_cache");
           if (cachedAvatar) {
@@ -45,10 +48,10 @@ function LoginForm() {
           navigate("/dashboard");
         })
         .catch(() => {
-          setErrorMsg(login_failed_msg);
+          errorMessage();
         });
     } else {
-      setErrorMsg(login_failed_msg);
+      errorMessage();
     }
   };
 

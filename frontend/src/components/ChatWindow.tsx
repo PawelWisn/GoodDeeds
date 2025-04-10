@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
-import "./ChatWindow.scss";
+import "../styles/ChatWindow.scss";
 import { format } from "date-fns";
 import { useLocation, useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
@@ -52,7 +52,9 @@ function Chat() {
       ownerName: sessionStorage.getItem("user_name"),
       ownerAvatar: sessionStorage.getItem("user_avatar"),
     });
-    socketRef.current!.send(payload);
+    if (socketRef.current) {
+      socketRef.current.send(payload);
+    }
   }
 
   async function demandPublicKey() {
@@ -162,7 +164,6 @@ function Chat() {
     try {
       await axiosClient.post("/users/notifications/", { room_id: roomId });
     } catch (error: any) {
-      console.error("Error sending notification:", error.response?.data?.error);
       const error_msg = error.response?.data?.error;
       if (error_msg) {
         toast.error(error_msg);
@@ -182,14 +183,14 @@ function Chat() {
   useEffect(() => {
     const ws = new WebSocket(`ws://0.0.0.0:8000/ws/chat/${roomId}/`);
     ws.onopen = () => {
-      console.log("WebSocket connection established");
+      console.log("Chat WebSocket connected");
       socketRef.current = ws;
       setupKeys();
       demandPublicKey();
       sendNotificationRoomJoined();
     };
     ws.onmessage = handleReceiveMessage;
-    ws.onerror = (error) => console.error("WebSocket error:", error);
+    ws.onerror = (error) => console.error("Chat WebSocket error:", error);
     ws.onclose = () => {
       socketRef.current = null;
     };

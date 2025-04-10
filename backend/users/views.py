@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 
 import requests
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from chat.models import ChatRoom
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -106,18 +108,11 @@ class LoggedInUsersView(APIView):
 
 
 class NotificationView(APIView):
-    def get(self, request):
-        key = f"notification_{request.user.id}"
-        if notification_data := cache.get(key):
-            cache.delete(key)
-            return Response(notification_data, status=HTTP_200_OK)
-        return Response({"notification": None, "room_id": None}, status=HTTP_200_OK)
-
     def post(self, request):
         room_id = request.data.get("room_id")
         if chat := ChatRoom.objects.filter(id=room_id).first():
             if recipient := chat.members.exclude(id=request.user.id).first():
-                key = f"notification_{recipient.id}"
+                channel_layer = get_channel_layer()
                 user_name = request.auth_token_data.get("name") or "Someone"
                 message = f"{user_name} wants to chat with you"
                 notification_data = {
@@ -127,6 +122,12 @@ class NotificationView(APIView):
                     "inviter": user_name,
                     "private_room": chat.private_room,
                 }
-                cache.set(key, notification_data, timeout=3600)
+                async_to_sync(channel_layer.group_send)(
+                    f"user_{recipient.id}",
+                    {
+                        "type": "send_notification",
+                        "data": notification_data,
+                    },
+                )
             return Response(status=HTTP_204_NO_CONTENT)
         return Response({"error": "Chat room not found"}, status=HTTP_404_NOT_FOUND)

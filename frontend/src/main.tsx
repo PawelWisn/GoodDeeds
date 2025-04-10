@@ -10,7 +10,8 @@ import Chat from "./views/Chat.tsx";
 import "./index.scss";
 import Cookies from "js-cookie";
 import axiosClient from "./utils/axiosInstance";
-import Toasts from "./components/Toasts";
+import Toasts from "./toasts/Toasts.tsx";
+import { WebSocketProvider } from "./toasts/ToastsWebSocketProvider.tsx";
 
 const VITE_GOOGLE_AUTH_KEY = import.meta.env.VITE_GOOGLE_AUTH_KEY;
 
@@ -32,17 +33,19 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={VITE_GOOGLE_AUTH_KEY}>
       <BrowserRouter>
-        <Toasts />
-        <Routes>
-          <Route path="/login" element={<Login />} />
+        <WebSocketProvider>
+          <Toasts />
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chats/:id" element={<Chat />} />
-          </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/chats/:id" element={<Chat />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </WebSocketProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
   </StrictMode>,

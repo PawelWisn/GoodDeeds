@@ -1,5 +1,5 @@
 import React from "react";
-import "./ListChatRooms.scss";
+import "../styles/ListChatRooms.scss";
 import ChatRoomCard from "./ChatRoomCard";
 
 interface ChatRoom {

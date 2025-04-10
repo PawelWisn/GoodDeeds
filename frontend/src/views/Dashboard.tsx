@@ -1,4 +1,4 @@
-import "./Dashboard.scss";
+import "../styles/Dashboard.scss";
 import "../index.scss";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router";
@@ -21,9 +21,9 @@ interface User {
 }
 
 function Dashboard() {
+  const location = useLocation();
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const location = useLocation();
 
   const initial = () => {
     fetchChatRooms();
