@@ -29,7 +29,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
     ws.onopen = () => {
-      console.log("Notification WebSocket connected");
+      console.log("Notification WebSocket connected", user_id);
       socketRef.current = ws;
     };
     ws.onclose = () => console.log("Notification WebSocket disconnected");
@@ -48,9 +48,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     handleStorageChange();
-    window.addEventListener("storage", handleStorageChange);
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
       if (socketRef.current) {
         socketRef.current.close();
       }

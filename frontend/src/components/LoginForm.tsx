@@ -14,6 +14,7 @@ function LoginForm() {
 
   useEffect(() => {
     sessionStorage.clear();
+    handleStorageChange();
   }, []);
 
   const responseMessage = (response: { credential?: string }) => {
@@ -53,6 +54,7 @@ function LoginForm() {
     } else {
       errorMessage();
     }
+    handleStorageChange();
   };
 
   const errorMessage = () => {
