@@ -1,20 +1,20 @@
 @use "../variables" as v;
 
 .chat-rooms-container {
-  padding: 2rem;
-  background-color: v.$bg;
-  color: #fff;
+	padding: 2rem;
+	background-color: v.$bg;
+	color: #fff;
 
-  h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
+	h2 {
+		text-align: center;
+		margin-bottom: 1.5rem;
+	}
 
-  .chat-rooms-grid {
-    margin: auto;
-    width: 80%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-    gap: 1.5rem;
-  }
+	.chat-rooms-grid {
+		margin: auto;
+		width: 80%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+		gap: 1.5rem;
+	}
 }

@@ -2,47 +2,47 @@
 @use "sass:color";
 
 .new-chat-room-container {
-  padding: 2rem;
-  background-color: v.$card-bg;
-  color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  width: clamp(50%, 50rem, 70%);
-  margin: 1rem auto;
+	padding: 2rem;
+	background-color: v.$card-bg;
+	color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	width: clamp(50%, 50rem, 70%);
+	margin: 1rem auto;
 
-  h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
+	h2 {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    color: #fff;
-    width: clamp(90%, 50rem, 100%);
-    margin: auto;
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		color: #fff;
+		width: clamp(90%, 50rem, 100%);
+		margin: auto;
 
-    input {
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      color: #fff;
-    }
+		input {
+			padding: 0.5rem;
+			font-size: 1rem;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			color: #fff;
+		}
 
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background-color: v.$submit-button-bg;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+		button {
+			padding: 0.5rem 1rem;
+			font-size: 1rem;
+			background-color: v.$submit-button-bg;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
 
-      &:hover {
-        background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
-      }
-    }
-  }
+			&:hover {
+				background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
+			}
+		}
+	}
 }

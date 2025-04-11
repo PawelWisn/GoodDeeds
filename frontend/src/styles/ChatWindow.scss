@@ -2,126 +2,126 @@
 @use "sass:color";
 
 .chat-container {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  align-items: center;
-  justify-content: space-between;
-  height: 85vh;
-  padding: 1rem;
-  background-color: v.$bg;
-  color: v.$card-bg;
-  width: 80%;
-  margin: auto;
-  height: calc(100vh - v.$navbar-height);
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	align-items: center;
+	justify-content: space-between;
+	height: 85vh;
+	padding: 1rem;
+	background-color: v.$bg;
+	color: v.$card-bg;
+	width: 80%;
+	margin: auto;
+	height: calc(100vh - v.$navbar-height);
 
-  .waiting-label {
-    color: yellow;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    text-align: center;
-  }
+	.waiting-label {
+		color: yellow;
+		font-size: 0.9rem;
+		margin-bottom: 0.5rem;
+		text-align: center;
+	}
 
-  #room-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0.5rem;
-    margin-bottom: 0.3rem;
-    color: silver;
+	#room-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-radius: 0.5rem;
+		margin-bottom: 0.3rem;
+		color: silver;
 
-    .recipient-info {
-      position: absolute;
-      left: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0;
+		.recipient-info {
+			position: absolute;
+			left: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0;
 
-      .recipient-avatar {
-        width: v.$avatar-width;
-        height: v.$avatar-height;
-        border-radius: v.$avatar-br;
-        object-fit: v.$avatar-object-fit;
-        border: v.$avatar-border;
-      }
+			.recipient-avatar {
+				width: v.$avatar-width;
+				height: v.$avatar-height;
+				border-radius: v.$avatar-br;
+				object-fit: v.$avatar-object-fit;
+				border: v.$avatar-border;
+			}
 
-      .recipient-name {
-        font-size: 1rem;
-        font-weight: bold;
-        margin: 0;
-      }
-    }
+			.recipient-name {
+				font-size: 1rem;
+				font-weight: bold;
+				margin: 0;
+			}
+		}
 
-    .chat-name-header {
-      font-size: 1.5rem;
-      font-style: italic;
-    }
-  }
+		.chat-name-header {
+			font-size: 1.5rem;
+			font-style: italic;
+		}
+	}
 
-  #chat-log {
-    flex-grow: 1;
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow-y: auto;
-    background-color: v.$chat-card-bg;
-    color: #333;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+	#chat-log {
+		flex-grow: 1;
+		width: 100%;
+		padding: 1rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		overflow-y: auto;
+		background-color: v.$chat-card-bg;
+		color: #333;
+		overflow-y: auto;
+		margin-bottom: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
 
-  .chat-message {
-    max-width: 60%;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    font-size: 1rem;
-    word-wrap: break-word;
+	.chat-message {
+		max-width: 60%;
+		padding: 0.5rem 1rem;
+		border-radius: 10px;
+		font-size: 1rem;
+		word-wrap: break-word;
 
-    &.own-message {
-      align-self: flex-end;
-      background-color: #006600;
-      color: #fff;
-    }
+		&.own-message {
+			align-self: flex-end;
+			background-color: #006600;
+			color: #fff;
+		}
 
-    &.incoming-message {
-      align-self: flex-start;
-      background-color: #efff12;
-      color: #000;
-    }
-  }
+		&.incoming-message {
+			align-self: flex-start;
+			background-color: #efff12;
+			color: #000;
+		}
+	}
 
-  input[type="text"] {
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 1rem;
+	input[type="text"] {
+		width: 100%;
+		padding: 0.5rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		margin-bottom: 1rem;
 
-    &:focus {
-      outline: none;
-      border-color: #fff;
-    }
-  }
+		&:focus {
+			outline: none;
+			border-color: #fff;
+		}
+	}
 
-  button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    background-color: v.$submit-button-bg;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+	button {
+		padding: 0.5rem 1rem;
+		font-size: 1rem;
+		background-color: v.$submit-button-bg;
+		color: #fff;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
 
-    &:hover {
-      background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
-    }
-  }
+		&:hover {
+			background-color: color.adjust(v.$submit-button-bg, $lightness: 10%);
+		}
+	}
 }

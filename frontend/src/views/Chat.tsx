@@ -1,7 +1,7 @@
 import ChatWindow from "../components/ChatWindow";
 
 function Chat() {
-  return <ChatWindow />;
+	return <ChatWindow />;
 }
 
 export default Chat;

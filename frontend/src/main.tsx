@@ -16,37 +16,37 @@ import { WebSocketProvider } from "./toasts/ToastsWebSocketProvider.tsx";
 const VITE_GOOGLE_AUTH_KEY = import.meta.env.VITE_GOOGLE_AUTH_KEY;
 
 const initializeCSRFToken = async () => {
-  try {
-    await axiosClient.get("/users/set_csrf_token/");
-    const csrftoken = Cookies.get("csrftoken");
-    if (csrftoken) {
-      axiosClient.defaults.headers.common["X-CSRFToken"] = csrftoken;
-    }
-  } catch (error) {
-    console.error("Failed to initialize CSRF token:", error);
-  }
+	try {
+		await axiosClient.get("/users/set_csrf_token/");
+		const csrftoken = Cookies.get("csrftoken");
+		if (csrftoken) {
+			axiosClient.defaults.headers.common["X-CSRFToken"] = csrftoken;
+		}
+	} catch (error) {
+		console.error("Failed to initialize CSRF token:", error);
+	}
 };
 
 initializeCSRFToken();
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <GoogleOAuthProvider clientId={VITE_GOOGLE_AUTH_KEY}>
-      <BrowserRouter>
-        <WebSocketProvider>
-          <Toasts />
-          <Routes>
-            <Route path="/login" element={<Login />} />
+	<StrictMode>
+		<GoogleOAuthProvider clientId={VITE_GOOGLE_AUTH_KEY}>
+			<BrowserRouter>
+				<WebSocketProvider>
+					<Toasts />
+					<Routes>
+						<Route path="/login" element={<Login />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/chats/:id" element={<Chat />} />
-            </Route>
+						<Route element={<ProtectedRoute />}>
+							<Route path="/dashboard" element={<Dashboard />} />
+							<Route path="/chats/:id" element={<Chat />} />
+						</Route>
 
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </WebSocketProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
-  </StrictMode>,
+						<Route path="*" element={<Navigate to="/dashboard" />} />
+					</Routes>
+				</WebSocketProvider>
+			</BrowserRouter>
+		</GoogleOAuthProvider>
+	</StrictMode>,
 );
