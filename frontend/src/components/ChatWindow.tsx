@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { generateKeys, importPublicKey, encryptMessage, decryptMessage } from "../utils/crypto";
+import WebSocketManager from "../utils/websocketManager";
 
 interface ChatMessage {
 	text: string;
@@ -34,7 +35,10 @@ function Chat() {
 	const recipientPublicKeyRef = useRef<CryptoKey | null>(null);
 
 	const saveChatData = (updatedChatLog: ChatMessage[] = chatLog) => {
-		const chatData = { chatL: updatedChatLog, myPublicKeyBase64: myPublicKeyBase64Ref.current };
+		const chatData = {
+			chatL: updatedChatLog,
+			myPublicKeyBase64: myPublicKeyBase64Ref.current,
+		};
 		sessionStorage.setItem(`chat_${roomId}`, JSON.stringify(chatData));
 	};
 
@@ -70,7 +74,10 @@ function Chat() {
 		if (demandingPublicKey || !socketRef.current) return;
 		setDemandingPublicKey(true);
 		setWaitingForRecipient(true);
-		const payload = JSON.stringify({ type: "public_key_demand", ownerUUID: myUUID });
+		const payload = JSON.stringify({
+			type: "public_key_demand",
+			ownerUUID: myUUID,
+		});
 		socketRef.current.send(payload);
 		await new Promise<void>((resolve) => {
 			const interval = setInterval(() => {
@@ -155,7 +162,11 @@ function Chat() {
 	async function handleIncomingMessage(data: any) {
 		if (!myPrivateKeyRef.current) return;
 		const decrypted = await decryptMessage(data.message, myPrivateKeyRef.current);
-		const newMessage = { text: decrypted, timestamp: data.timestamp, isOwnMessage: false };
+		const newMessage = {
+			text: decrypted,
+			timestamp: data.timestamp,
+			isOwnMessage: false,
+		};
 		setChatLog((prevChatLog) => {
 			const updatedChatLog = [...prevChatLog, newMessage];
 			saveChatData(updatedChatLog);
@@ -186,6 +197,7 @@ function Chat() {
 	useEffect(() => {
 		restoreChatData();
 		const ws = new WebSocket(`ws://0.0.0.0:8000/ws/chat/${roomId}/`);
+		WebSocketManager.addConnection(ws);
 		ws.onopen = () => {
 			console.log("Chat WebSocket connected");
 			socketRef.current = ws;
@@ -197,9 +209,13 @@ function Chat() {
 		ws.onerror = (error) => console.error("Chat WebSocket error:", error);
 		ws.onclose = () => {
 			socketRef.current = null;
+			WebSocketManager.removeConnection(ws);
 		};
 
-		return () => ws.close();
+		return () => {
+			ws.close();
+			WebSocketManager.removeConnection(ws);
+		};
 	}, []);
 
 	return (

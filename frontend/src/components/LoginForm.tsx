@@ -5,6 +5,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";
 import { useWebSocket } from "../toasts/ToastsWebSocketProvider";
 import toast from "react-hot-toast";
+import WebSocketManager from "../utils/websocketManager";
 
 function LoginForm() {
 	let navigate = useNavigate();
@@ -12,6 +13,7 @@ function LoginForm() {
 
 	useEffect(() => {
 		sessionStorage.clear();
+		WebSocketManager.closeAllConnections();
 		handleStorageChange();
 	}, []);
 

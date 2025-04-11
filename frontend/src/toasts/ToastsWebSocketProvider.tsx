@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
+import WebSocketManager from "../utils/websocketManager";
 
 interface WebSocketContextType {
 	handleStorageChange: () => void;
@@ -17,8 +18,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 		if (!user_id) {
 			return;
 		}
+		if (socketRef.current) {
+			socketRef.current.close();
+		}
 
 		const ws = new WebSocket(`ws://0.0.0.0:8000/ws/notifications/${user_id}/`);
+		WebSocketManager.addConnection(ws);
 
 		ws.onmessage = (event) => {
 			const data = JSON.parse(event.data);
@@ -30,7 +35,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 			console.log("Notification WebSocket connected", user_id);
 			socketRef.current = ws;
 		};
-		ws.onclose = () => console.log("Notification WebSocket disconnected");
+		ws.onclose = () => {
+			socketRef.current = null;
+			WebSocketManager.removeConnection(ws);
+		};
 		ws.onerror = (error) => console.error("Notification WebSocket error:", error);
 	};
 
@@ -44,11 +52,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 	};
 
 	useEffect(() => {
+		const handleBeforeUnload = () => {
+			WebSocketManager.closeAllConnections();
+		};
+		window.addEventListener("beforeunload", handleBeforeUnload);
 		handleStorageChange();
 		return () => {
 			if (socketRef.current) {
 				socketRef.current.close();
+				WebSocketManager.removeConnection(socketRef.current);
 			}
+			window.removeEventListener("beforeunload", handleBeforeUnload);
 		};
 	}, []);
 
