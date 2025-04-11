@@ -8,9 +8,7 @@ interface WebSocketContextType {
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const socketRef = useRef<WebSocket | null>(null);
   const navigate = useNavigate();
 
@@ -33,8 +31,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       socketRef.current = ws;
     };
     ws.onclose = () => console.log("Notification WebSocket disconnected");
-    ws.onerror = (error) =>
-      console.error("Notification WebSocket error:", error);
+    ws.onerror = (error) => console.error("Notification WebSocket error:", error);
   };
 
   const handleStorageChange = () => {
@@ -139,11 +136,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
-  return (
-    <WebSocketContext.Provider value={{ handleStorageChange }}>
-      {children}
-    </WebSocketContext.Provider>
-  );
+  return <WebSocketContext.Provider value={{ handleStorageChange }}>{children}</WebSocketContext.Provider>;
 };
 
 export const useWebSocket = () => {

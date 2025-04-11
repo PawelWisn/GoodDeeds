@@ -42,13 +42,7 @@ const Navbar: React.FC = () => {
       </div>
       <div className="navbar-right">
         <div className="nav-user-name">{userName || ""}</div>
-        {userAvatar && (
-          <img
-            className="recipient-avatar"
-            src={userAvatar}
-            alt="User Avatar"
-          />
-        )}
+        {userAvatar && <img className="recipient-avatar" src={userAvatar} alt="User Avatar" />}
         <button onClick={handleLogout}>Logout</button>
       </div>
     </nav>

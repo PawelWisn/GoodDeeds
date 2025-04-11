@@ -44,9 +44,7 @@ function Dashboard() {
 
   const handleDeleteChatRoom = (id: number) => {
     axiosClient.delete(`/chats/${id}/`).then(() => {
-      setChatRooms((prevRooms) =>
-        prevRooms.filter((room: ChatRoom) => room.id !== id),
-      );
+      setChatRooms((prevRooms) => prevRooms.filter((room: ChatRoom) => room.id !== id));
     });
     toast.success("Chat room deleted successfully!");
   };

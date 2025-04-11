@@ -16,16 +16,11 @@ interface ListUsersProps {
 const UserList: React.FC<ListUsersProps> = ({ users }) => {
   const navigate = useNavigate();
 
-  const handleUserClick = async (
-    recipient_id: number,
-    recipient_name: string,
-  ) => {
+  const handleUserClick = async (recipient_id: number, recipient_name: string) => {
     const roomName = "Private room with " + recipient_name;
 
     try {
-      const response = await axiosClient.get(
-        `/chats/private_room/${recipient_id}/`,
-      );
+      const response = await axiosClient.get(`/chats/private_room/${recipient_id}/`);
       const existingRoom = response.data;
 
       if (existingRoom) {

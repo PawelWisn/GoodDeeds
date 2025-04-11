@@ -23,3 +23,6 @@ repos:
     rev: "v4.0.0-alpha.8"
     hooks:
       - id: prettier
+        additional_dependencies:
+          - prettier@3.5.3
+        args: ["--print-width", "180", "--tab-width", "2", "--object-wrap", "preserve"]

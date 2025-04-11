@@ -32,9 +32,7 @@ const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
           toast("Session expired, please log in again", { icon: "⚠️" });
           navigate("/login");
         } else {
-          toast.error(
-            error.response?.data?.error || "Failed to create chat room",
-          );
+          toast.error(error.response?.data?.error || "Failed to create chat room");
         }
       });
   };
@@ -43,12 +41,7 @@ const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
     <div className="new-chat-room-container">
       <h2>Create new chat room</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter chat room name"
-          value={chatRoomName}
-          onChange={(e) => setChatRoomName(e.target.value)}
-        />
+        <input type="text" placeholder="Enter chat room name" value={chatRoomName} onChange={(e) => setChatRoomName(e.target.value)} />
         <button type="submit">Create</button>
       </form>
     </div>

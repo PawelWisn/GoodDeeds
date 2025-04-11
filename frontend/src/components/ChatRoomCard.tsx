@@ -11,12 +11,7 @@ interface ChatRoomCardProps {
   onDelete: (id: number) => void;
 }
 
-const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
-  id,
-  name,
-  canDelete,
-  onDelete,
-}) => {
+const ChatRoomCard: React.FC<ChatRoomCardProps> = ({ id, name, canDelete, onDelete }) => {
   const navigate = useNavigate();
 
   const handleCardClick = async () => {
@@ -30,9 +25,7 @@ const ChatRoomCard: React.FC<ChatRoomCardProps> = ({
         toast("Session expired, please log in again", { icon: "⚠️" });
         navigate("/login");
       } else {
-        toast.error(
-          error.response?.data?.error || "An unexpected error occurred",
-        );
+        toast.error(error.response?.data?.error || "An unexpected error occurred");
         navigate("/dashboard", { state: { refresh: true } });
       }
     }
