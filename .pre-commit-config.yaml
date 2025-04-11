@@ -26,4 +26,4 @@ repos:
             files: \.(tsx|scss)$
             additional_dependencies:
                 - prettier@3.5.3
-            args: ["--print-width", "180", "--use-tabs", "--object-wrap", "preserve"]
+            args: ["--print-width", "120", "--use-tabs", "--object-wrap", "preserve"]

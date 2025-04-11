@@ -41,7 +41,12 @@ const NewChatRoom: React.FC<NewChatRoomProps> = ({ onChatRoomCreated }) => {
 		<div className="new-chat-room-container">
 			<h2>Create new chat room</h2>
 			<form onSubmit={handleSubmit}>
-				<input type="text" placeholder="Enter chat room name" value={chatRoomName} onChange={(e) => setChatRoomName(e.target.value)} />
+				<input
+					type="text"
+					placeholder="Enter chat room name"
+					value={chatRoomName}
+					onChange={(e) => setChatRoomName(e.target.value)}
+				/>
 				<button type="submit">Create</button>
 			</form>
 		</div>

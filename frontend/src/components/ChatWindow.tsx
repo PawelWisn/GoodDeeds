@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { useLocation, useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import toast from "react-hot-toast";
-import { generateKeys, importPublicKey, importPrivateKey, encryptMessage, decryptMessage } from "../utils/crypto";
+import { generateKeys, importPublicKey, encryptMessage, decryptMessage } from "../utils/crypto";
 
 interface ChatMessage {
 	text: string;
@@ -34,27 +34,17 @@ function Chat() {
 	const recipientPublicKeyRef = useRef<CryptoKey | null>(null);
 
 	const saveChatData = (updatedChatLog: ChatMessage[] = chatLog) => {
-		console.log("saving chatLog", updatedChatLog);
-		const chatData = { chatL: updatedChatLog, myPublicKeyBase64: myPublicKeyBase64Ref.current, myPrivateKey: sessionStorage.getItem(`privateKey_${roomId}`) };
-		console.log("saving chatData", chatData);
+		const chatData = { chatL: updatedChatLog, myPublicKeyBase64: myPublicKeyBase64Ref.current };
 		sessionStorage.setItem(`chat_${roomId}`, JSON.stringify(chatData));
-		console.log("Chat data saved to sessionStorage");
 	};
 
 	const restoreChatData = async () => {
 		const chatData = sessionStorage.getItem(`chat_${roomId}`);
-		console.log("restored chatData", chatData);
 		if (chatData) {
-			const { chatL, myPublicKeyBase64, myPrivateKey } = JSON.parse(chatData);
-			console.log("restored chatLog", chatL);
+			const { chatL, myPublicKeyBase64 } = JSON.parse(chatData);
 			setChatLog(chatL || []);
 			myPublicKeyBase64Ref.current = myPublicKeyBase64;
-
-			if (myPrivateKey) {
-				myPrivateKeyRef.current = await importPrivateKey(myPrivateKey);
-			}
 		}
-		console.log("Chat data restored from sessionStorage");
 	};
 
 	async function setupKeys() {
@@ -63,9 +53,6 @@ function Chat() {
 		myPublicKeyRef.current = publicKey;
 		myPublicKeyBase64Ref.current = publicKeyBase64;
 		myPrivateKeyRef.current = privateKey;
-
-		const exportedPrivateKey = await window.crypto.subtle.exportKey("pkcs8", privateKey);
-		sessionStorage.setItem(`privateKey_${roomId}`, btoa(String.fromCharCode(...new Uint8Array(exportedPrivateKey))));
 
 		const payload = JSON.stringify({
 			type: "public_key",
@@ -99,15 +86,17 @@ function Chat() {
 
 	async function handleSendMessage() {
 		if (!message || !socketRef.current) return;
-		console.log("recipientPublicKeyRef.current", recipientPublicKeyRef.current);
 		if (!recipientPublicKeyRef.current) {
 			await demandPublicKey();
 		} else {
-			console.log("has recipientPublicKeyRef.current", recipientPublicKeyRef.current);
-
 			const encryptedBase64 = await encryptMessage(message, recipientPublicKeyRef.current!);
 			const timestamp = format(new Date(), "dd.MM.yyyy HH:mm:ss");
-			const payload = JSON.stringify({ type: "message", message: encryptedBase64, ownerUUID: myUUID, timestamp: timestamp });
+			const payload = JSON.stringify({
+				type: "message",
+				message: encryptedBase64,
+				ownerUUID: myUUID,
+				timestamp: timestamp,
+			});
 			socketRef.current.send(payload);
 
 			const newMessage = { text: message, timestamp, isOwnMessage: true };
@@ -224,7 +213,11 @@ function Chat() {
 			</div>
 			<div id="chat-log">
 				{chatLog.map((msg, index) => (
-					<div key={index} title={msg.timestamp} className={`chat-message ${msg.isOwnMessage ? "own-message" : "incoming-message"}`}>
+					<div
+						key={index}
+						title={msg.timestamp}
+						className={`chat-message ${msg.isOwnMessage ? "own-message" : "incoming-message"}`}
+					>
 						{msg.text}
 					</div>
 				))}
