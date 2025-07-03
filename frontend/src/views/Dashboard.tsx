@@ -1,6 +1,6 @@
 import "../styles/Dashboard.scss";
 import "../index.scss";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import ListChatRooms from "../components/ListChatRooms";

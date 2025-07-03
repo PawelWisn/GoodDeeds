@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import "../styles/ChatWindow.scss";
 import { format } from "date-fns";
 import { useLocation, useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import toast from "react-hot-toast";
-import { generateKeys, importPublicKey, encryptMessage, decryptMessage } from "../utils/crypto";
 import WebSocketManager from "../utils/websocketManager";
 
 interface ChatMessage {
@@ -26,41 +25,25 @@ function Chat() {
 	const [recipientName, setRecipientName] = useState("");
 	const [recipientAvatar, setRecipientAvatar] = useState("");
 	const [waitingForRecipient, setWaitingForRecipient] = useState(true);
-	const [demandingPublicKey, setDemandingPublicKey] = useState(false);
 
 	const socketRef = useRef<WebSocket | null>(null);
-	const myPublicKeyRef = useRef<CryptoKey | null>(null);
-	const myPublicKeyBase64Ref = useRef<string | null>(null);
-	const myPrivateKeyRef = useRef<CryptoKey | null>(null);
-	const recipientPublicKeyRef = useRef<CryptoKey | null>(null);
 
 	const saveChatData = (updatedChatLog: ChatMessage[] = chatLog) => {
-		const chatData = {
-			chatL: updatedChatLog,
-			myPublicKeyBase64: myPublicKeyBase64Ref.current,
-		};
+		const chatData = { chatLog: updatedChatLog };
 		sessionStorage.setItem(`chat_${roomId}`, JSON.stringify(chatData));
 	};
 
 	const restoreChatData = async () => {
 		const chatData = sessionStorage.getItem(`chat_${roomId}`);
 		if (chatData) {
-			const { chatL, myPublicKeyBase64 } = JSON.parse(chatData);
-			setChatLog(chatL || []);
-			myPublicKeyBase64Ref.current = myPublicKeyBase64;
+			const parsed = JSON.parse(chatData);
+			setChatLog(parsed.chatLog || []);
 		}
 	};
 
-	async function setupKeys() {
-		const { publicKey, privateKey, publicKeyBase64 } = await generateKeys();
-
-		myPublicKeyRef.current = publicKey;
-		myPublicKeyBase64Ref.current = publicKeyBase64;
-		myPrivateKeyRef.current = privateKey;
-
+	async function sendUserData() {
 		const payload = JSON.stringify({
-			type: "public_key",
-			key: publicKeyBase64,
+			type: "share_data",
 			ownerUUID: myUUID,
 			ownerName: sessionStorage.getItem("user_name"),
 			ownerAvatar: sessionStorage.getItem("user_avatar"),
@@ -70,21 +53,19 @@ function Chat() {
 		}
 	}
 
-	async function demandPublicKey() {
-		if (demandingPublicKey || !socketRef.current) return;
-		setDemandingPublicKey(true);
+	async function demandRecipientData() {
+		if (!socketRef.current) return;
 		setWaitingForRecipient(true);
 		const payload = JSON.stringify({
-			type: "public_key_demand",
+			type: "share_data_demand",
 			ownerUUID: myUUID,
 		});
 		socketRef.current.send(payload);
 		await new Promise<void>((resolve) => {
 			const interval = setInterval(() => {
-				if (recipientPublicKeyRef.current) {
+				if (recipientName) {
 					clearInterval(interval);
 					setWaitingForRecipient(false);
-					setDemandingPublicKey(false);
 					resolve();
 				}
 			}, 500);
@@ -93,21 +74,20 @@ function Chat() {
 
 	async function handleSendMessage() {
 		if (!message || !socketRef.current) return;
-		if (!recipientPublicKeyRef.current) {
-			await demandPublicKey();
+		if (!recipientName) {
+			await demandRecipientData();
 		} else {
-			const encryptedBase64 = await encryptMessage(message, recipientPublicKeyRef.current!);
 			const timestamp = format(new Date(), "dd.MM.yyyy HH:mm:ss");
 			const payload = JSON.stringify({
 				type: "message",
-				message: encryptedBase64,
+				message: message,
 				ownerUUID: myUUID,
 				timestamp: timestamp,
 			});
 			socketRef.current.send(payload);
 
 			const newMessage = { text: message, timestamp, isOwnMessage: true };
-			setChatLog((prevChatLog) => {
+			setChatLog((prevChatLog: ChatMessage[]) => {
 				const updatedChatLog = [...prevChatLog, newMessage];
 				saveChatData(updatedChatLog);
 				return updatedChatLog;
@@ -116,11 +96,10 @@ function Chat() {
 		}
 	}
 
-	async function handlePublicKeyDemand() {
+	async function handeUserDataDemand() {
 		if (!socketRef.current) return;
 		const payload = JSON.stringify({
-			type: "public_key",
-			key: myPublicKeyBase64Ref.current,
+			type: "share_data",
 			ownerUUID: myUUID,
 			ownerName: sessionStorage.getItem("user_name"),
 			ownerAvatar: sessionStorage.getItem("user_avatar"),
@@ -128,12 +107,7 @@ function Chat() {
 		socketRef.current.send(payload);
 	}
 
-	async function handlePublicKey(data: any) {
-		let publicKey: CryptoKey | null = null;
-		if (data.key) {
-			publicKey = await importPublicKey(data.key);
-		}
-		recipientPublicKeyRef.current = publicKey;
+	async function handeIncomingUserData(data: any) {
 		setWaitingForRecipient(false);
 		setRecipientName(data.ownerName);
 
@@ -155,19 +129,17 @@ function Chat() {
 				console.error("Failed to fetch avatar:", error);
 			}
 		}
-
-		setWaitingForRecipient(recipientPublicKeyRef.current === null);
+		setWaitingForRecipient(data.ownerName ? false : true);
+		
 	}
 
 	async function handleIncomingMessage(data: any) {
-		if (!myPrivateKeyRef.current) return;
-		const decrypted = await decryptMessage(data.message, myPrivateKeyRef.current);
 		const newMessage = {
-			text: decrypted,
+			text: data.message,
 			timestamp: data.timestamp,
 			isOwnMessage: false,
 		};
-		setChatLog((prevChatLog) => {
+		setChatLog((prevChatLog: ChatMessage[]) => {
 			const updatedChatLog = [...prevChatLog, newMessage];
 			saveChatData(updatedChatLog);
 			return updatedChatLog;
@@ -190,8 +162,8 @@ function Chat() {
 		const data = JSON.parse(event.data);
 		if (data.ownerUUID === myUUID) return;
 		if (data.type === "message") await handleIncomingMessage(data);
-		if (data.type === "public_key") await handlePublicKey(data);
-		if (data.type === "public_key_demand") await handlePublicKeyDemand();
+		if (data.type === "share_data") await handeIncomingUserData(data);
+		if (data.type === "share_data_demand") await handeUserDataDemand();
 	}
 
 	useEffect(() => {
@@ -201,8 +173,8 @@ function Chat() {
 		ws.onopen = () => {
 			console.log("Chat WebSocket connected");
 			socketRef.current = ws;
-			setupKeys();
-			demandPublicKey();
+			sendUserData();
+			demandRecipientData();
 			sendNotificationRoomJoined();
 		};
 		ws.onmessage = handleReceiveMessage;
@@ -251,7 +223,7 @@ function Chat() {
 				}}
 				autoFocus
 			/>
-			<button onClick={handleSendMessage}>Encrypt & Send</button>
+			<button onClick={handleSendMessage}>Send</button>
 		</div>
 	);
 }

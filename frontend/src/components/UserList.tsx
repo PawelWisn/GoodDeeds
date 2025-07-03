@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import "../styles/UserList.scss";
@@ -13,7 +12,7 @@ interface ListUsersProps {
 	users: User[];
 }
 
-const UserList: React.FC<ListUsersProps> = ({ users }) => {
+const UserList = ({ users }: ListUsersProps) => {
 	const navigate = useNavigate();
 
 	const handleUserClick = async (recipient_id: number, recipient_name: string) => {

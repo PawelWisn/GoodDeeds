@@ -19,12 +19,17 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./backend
+          target: /app
+          action: sync
+        - path: ./Dockerfile
+          action: rebuild
     command: python manage.py runserver 0.0.0.0:8000
     hostname: backend
     ports:
       - "$BE_PORT:8000"
-    volumes:
-      - ./backend:/app
     environment:
       - TZ=$TIMEZONE
     env_file:
@@ -56,9 +61,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./frontend
+          target: /app
+          action: rebuild
     hostname: frontend
     volumes:
-      - ./frontend:/app
       - /app/node_modules
     env_file:
       - .env
@@ -76,5 +85,3 @@ services:
 
 volumes:
   db-data:
-  backend:
-  frontend:

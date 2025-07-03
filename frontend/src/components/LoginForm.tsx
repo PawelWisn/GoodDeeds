@@ -1,5 +1,5 @@
 import "../styles/LoginForm.scss";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosClient from "../utils/axiosInstance";

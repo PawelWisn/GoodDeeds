@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import axiosClient from "../utils/axiosInstance";
 import "../styles/ChatRoomCard.scss";
