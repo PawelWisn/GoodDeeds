@@ -130,7 +130,6 @@ function Chat() {
 			}
 		}
 		setWaitingForRecipient(data.ownerName ? false : true);
-		
 	}
 
 	async function handleIncomingMessage(data: any) {

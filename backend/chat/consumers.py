@@ -26,7 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "key": None,
             "ownerUUID": "",
         }
-        
+
         await self.channel_layer.group_send(self.room_group_name, disconnect_message)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -36,7 +36,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         logger.info("ChatConsumer - receiving...")
 
         data = json.loads(text_data)
-        
+
         if data["type"] == "share_data":
             data["type"] = "broadcast.share_data"
         elif data["type"] == "message":
@@ -47,31 +47,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
             raise ValueError(f"Invalid message type")
 
         await self.channel_layer.group_send(self.room_group_name, data)
-        
+
         logger.info(f"ChatConsumer - received [{data['type']}] from [{data['ownerUUID']}]")
-            
 
     async def broadcast_message(self, event):
         logger.info("ChatConsumer - broadcasting message...")
 
         event["type"] = "message"
         await self.send(text_data=json.dumps(event))
-        
+
         logger.info(f"ChatConsumer - broadcasted message from [{event['ownerUUID']}]")
 
     async def broadcast_share_data(self, event):
         logger.info("ChatConsumer - broadcasting user data...")
-        
+
         event["type"] = "share_data"
         await self.send(text_data=json.dumps(event))
-        
+
         logger.info(f"ChatConsumer - broadcasted user data of [{event['ownerUUID']}]")
-        
 
     async def demand_share_data(self, event):
         logger.info("ChatConsumer - demanding user data...")
         event["type"] = "share_data_demand"
-        
+
         await self.send(text_data=json.dumps(event))
         logger.info(f"ChatConsumer - demanded user data from [{event['ownerUUID']}]")
 
