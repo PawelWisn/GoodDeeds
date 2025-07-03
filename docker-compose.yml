@@ -16,16 +16,20 @@ services:
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASSWORD
   backend:
-    restart: on-failure
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: python manage.py runserver
+    develop:
+      watch:
+        - path: ./backend
+          target: /app
+          action: sync
+        - path: ./Dockerfile
+          action: rebuild
+    command: python manage.py runserver 0.0.0.0:8000
     hostname: backend
     ports:
       - "$BE_PORT:8000"
-    volumes:
-      - ./backend:/app
     environment:
       - TZ=$TIMEZONE
     env_file:
@@ -53,7 +57,31 @@ services:
       - .env
     depends_on:
       - redis
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./frontend
+          target: /app
+          action: rebuild
+    hostname: frontend
+    volumes:
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - VITE_API_URL=$API_URL
+      - VITE_GOOGLE_AUTH_KEY=$GOOGLE_OAUTH2_KEY
+      - VITE_GOOGLE_TOKEN_URL=$GOOGLE_OAUTH2_TOKEN_URL
+    ports:
+      - "$FE_PORT:8080"
+    stdin_open: true
+    tty: true
+    command: npm run dev
+    depends_on:
+      - backend
 
 volumes:
   db-data:
-  backend:

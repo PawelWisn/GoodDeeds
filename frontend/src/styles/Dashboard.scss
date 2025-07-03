@@ -1,0 +1,14 @@
+@use "../variables" as v;
+@use "sass:color";
+
+.dashboard {
+	display: flex;
+	justify-content: space-between;
+	padding: 1rem;
+	height: calc(100vh - v.$navbar-height);
+
+	.main-content {
+		flex: 1;
+		margin-right: 1rem;
+	}
+}
